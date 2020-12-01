@@ -22,3 +22,9 @@ cd build
 cmake .. -DCMAKE_TOOLCHAIN_FILE=${VCPKG_DIR}/scripts/buildsystems/vcpkg.cmake
 cmake --build . --config Release
 ```
+
+## Run Test
+
+```bash
+cmake --build . --config Release --target test
+```

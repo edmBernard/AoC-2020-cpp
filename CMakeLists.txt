@@ -43,18 +43,16 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/day1)
 
-
-enable_testing()
-
 SET(TEST_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/catch2-main.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/day1-catch2.cpp
 )
 
 add_executable(unit-test ${TEST_SOURCES} ${SOURCES})
+set_property(TARGET unit-test PROPERTY CXX_STANDARD 20)
 target_link_libraries(unit-test PRIVATE -lstdc++fs Catch2::Catch2)
 
-add_test(NAME "unit_test_default"
+add_custom_target(test
   COMMAND unit-test
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/input
 )
