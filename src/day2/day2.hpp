@@ -30,6 +30,16 @@ int part1(const std::vector<std::tuple<int, int, char, std::string>> &list) {
   return validPassword;
 }
 
+int part2(const std::vector<std::tuple<int, int, char, std::string>> &list) {
+  int validPassword = 0;
+  for (auto [pos1, pos2, letter, password] : list) {
+    if ((password[pos1-1] == letter) ^ (password[pos2-1] == letter)) {
+      ++validPassword;
+    }
+  }
+  return validPassword;
+}
+
 
 std::vector<std::tuple<int, int, char, std::string>> parseInputFile(std::string filename) {
   std::ifstream infile(filename);

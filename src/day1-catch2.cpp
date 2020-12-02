@@ -12,10 +12,10 @@ TEST_CASE("AoC2020 Day1", "[day1]") {
 
   std::vector<size_t> numberList = parseInputFile(filename);
 
-  SECTION("Part1 :" + filename) {
+  SECTION("Part1 : " + filename) {
     CHECK(find2Sum(numberList) == expectedPart1);
   }
-  SECTION("Part2 :" + filename) {
+  SECTION("Part2 : " + filename) {
     CHECK(find3Sum(numberList) == expectedPart2);
   }
 }

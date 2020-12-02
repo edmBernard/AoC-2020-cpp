@@ -11,7 +11,7 @@ int main(int argc, const char **argv) {
   std::vector<std::tuple<int, int, char, std::string>> elementList = parseInputFile(argv[1]);
 
   std::cout << "Result part1: " << part1(parseInputFile(argv[1])) << std::endl;
-  // std::cout << "Result part2: " << parseInputFile(argv[1]) << std::endl;
+  std::cout << "Result part2: " << part2(parseInputFile(argv[1])) << std::endl;
 
   return 0;
 }
