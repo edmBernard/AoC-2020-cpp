@@ -4,6 +4,7 @@
 #include <exception>
 #include <fstream>
 #include <regex>
+#include <sstream>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -49,6 +50,24 @@ std::vector<std::tuple<int, int, char, std::string>> parseInputFile(std::string 
 
   std::vector<std::tuple<int, int, char, std::string>> elementList;
   std::string line;
+
+#ifdef USE_OPTIMIZED_VERSION
+  std::string pos1;
+  std::string pos2;
+  std::string letter;
+  std::string password;
+  while (getline(infile, line)) {
+    std::stringstream ss(line);
+    // example of line content:
+    // 1-3 a: abcde
+    std::getline(ss, pos1, '-');
+    std::getline(ss, pos2, ' ');
+    std::getline(ss, letter, ':');
+    std::getline(ss, password, ' '); // strip extra white space
+    std::getline(ss, password);
+    elementList.push_back(std::make_tuple(std::stoi(pos1), std::stoi(pos2), letter[0], password));
+  }
+#else
   std::regex parseRegex("([0-9]+)-([0-9]+) ([a-z]): ([a-z]+)");
   std::smatch match;
   while (getline(infile, line)) {
@@ -56,6 +75,7 @@ std::vector<std::tuple<int, int, char, std::string>> parseInputFile(std::string 
       elementList.push_back(std::make_tuple(std::stoi(match[1]), std::stoi(match[2]), match[3].str()[0], match[4].str()));
     }
   }
+#endif
   return elementList;
 }
 

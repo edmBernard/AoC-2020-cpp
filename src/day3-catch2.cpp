@@ -7,7 +7,7 @@
 
 TEST_CASE("AoC2020 Day3", "[day3]") {
 
-  auto [filename, expectedPart1, expectedPart2] = GENERATE(table<std::string, size_t, size_t>({
+  auto [filename, expectedPart1, expectedPart2] = GENERATE(table<std::string, size_t, long long>({
       std::make_tuple("day3/input_part1_test1.txt", 7, 336),
       std::make_tuple("day3/input.txt", 200, 3737923200)
     }));

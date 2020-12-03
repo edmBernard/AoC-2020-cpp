@@ -5,6 +5,10 @@ project(AoC-2020)
 #**************************************************************************************************
 cmake_minimum_required(VERSION 3.17)
 
+option(USE_OPTIMIZED_VERSION "Switch to disable my try to have faster version" ON)
+if (USE_OPTIMIZED_VERSION)
+  add_compile_definitions(USE_OPTIMIZED_VERSION)
+endif()
 
 #**************************************************************************************************
 # Find Package ************************************************************************************
@@ -31,7 +35,11 @@ SET(SOURCES
 
 #**************************************************************************************************
 # Set compiler ************************************************************************************
-add_compile_options(-std=c++2a -fPIC) # for all targets in current directory
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+  add_compile_options(/std:c++17 /W4)
+else()
+  add_compile_options(-std=c++2a -fPIC -O3)
+endif()
 
 #**************************************************************************************************
 # Linker ******************************************************************************************
@@ -54,13 +62,10 @@ SET(TEST_SOURCES
 )
 
 add_executable(unit-test ${TEST_SOURCES} ${SOURCES})
-set_property(TARGET unit-test PROPERTY CXX_STANDARD 20)
-target_link_libraries(unit-test PRIVATE -lstdc++fs Catch2::Catch2)
+target_link_libraries(unit-test PRIVATE Catch2::Catch2)
 
 add_executable(benchmark ${CMAKE_CURRENT_SOURCE_DIR}/src/benchmark.cpp)
-set_property(TARGET benchmark PROPERTY CXX_STANDARD 20)
-target_compile_options(benchmark PRIVATE -O3)
-target_link_libraries(benchmark PRIVATE -pthread fmt::fmt)
+target_link_libraries(benchmark PRIVATE fmt::fmt)
 
 add_custom_target(test
   COMMAND unit-test

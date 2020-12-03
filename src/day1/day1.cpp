@@ -3,7 +3,7 @@
 #include "day1.hpp"
 
 
-int main(int argc, const char **argv) {
+int main(int, const char **argv) {
   using namespace day1;
   std::cout << "Input File : " << argv[1] << std::endl;
 
