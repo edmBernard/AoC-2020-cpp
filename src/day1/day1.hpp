@@ -1,13 +1,14 @@
 
 #pragma once
 
-#include <vector>
-#include <string>
 #include <exception>
 #include <fstream>
+#include <string>
+#include <vector>
 
+namespace day1 {
 
-size_t find2Sum(const std::vector<size_t>& list) {
+size_t part1(const std::vector<size_t> &list) {
   for (auto l1 : list) {
     for (auto l2 : list) {
       if (l1 + l2 == 2020) {
@@ -18,7 +19,7 @@ size_t find2Sum(const std::vector<size_t>& list) {
   return 0;
 }
 
-size_t find3Sum(const std::vector<size_t>& list) {
+size_t part2(const std::vector<size_t> &list) {
   for (auto l1 : list) {
     for (auto l2 : list) {
       for (auto l3 : list) {
@@ -44,3 +45,5 @@ std::vector<size_t> parseInputFile(std::string filename) {
   }
   return numberList;
 }
+
+} // namespace day1

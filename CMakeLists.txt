@@ -9,6 +9,7 @@ cmake_minimum_required(VERSION 3.17)
 #**************************************************************************************************
 # Find Package ************************************************************************************
 find_package(Catch2 CONFIG REQUIRED)
+find_package(fmt CONFIG REQUIRED)
 
 # get_cmake_property(_variableNames VARIABLES)
 # list (SORT _variableNames)
@@ -55,6 +56,11 @@ SET(TEST_SOURCES
 add_executable(unit-test ${TEST_SOURCES} ${SOURCES})
 set_property(TARGET unit-test PROPERTY CXX_STANDARD 20)
 target_link_libraries(unit-test PRIVATE -lstdc++fs Catch2::Catch2)
+
+add_executable(benchmark ${CMAKE_CURRENT_SOURCE_DIR}/src/benchmark.cpp)
+set_property(TARGET benchmark PROPERTY CXX_STANDARD 20)
+target_compile_options(benchmark PRIVATE -O3)
+target_link_libraries(benchmark PRIVATE -pthread fmt::fmt)
 
 add_custom_target(test
   COMMAND unit-test

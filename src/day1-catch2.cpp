@@ -10,12 +10,12 @@ TEST_CASE("AoC2020 Day1", "[day1]") {
       std::make_tuple("day1/input.txt", 381699, 111605670)
     }));
 
-  std::vector<size_t> numberList = parseInputFile(filename);
+  std::vector<size_t> numberList = day1::parseInputFile(filename);
 
   SECTION("Part1 : " + filename) {
-    CHECK(find2Sum(numberList) == expectedPart1);
+    CHECK(day1::part1(numberList) == expectedPart1);
   }
   SECTION("Part2 : " + filename) {
-    CHECK(find3Sum(numberList) == expectedPart2);
+    CHECK(day1::part2(numberList) == expectedPart2);
   }
 }
