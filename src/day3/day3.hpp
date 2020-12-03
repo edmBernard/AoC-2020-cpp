@@ -28,7 +28,7 @@ private:
 };
 
 template <typename T>
-int part1(const Map<T> &map, size_t stepX, size_t stepY) {
+int getEncounteredTree(const Map<T> &map, size_t stepX, size_t stepY) {
   int count = 0;
   size_t posX = 0;
   size_t posY = 0;
@@ -37,18 +37,27 @@ int part1(const Map<T> &map, size_t stepX, size_t stepY) {
     posX += stepX;
     posY += stepY;
   }
-
   return count;
 }
 
-int part2(const std::vector<std::tuple<int, int, char, std::string>> &list) {
-  int validPassword = 0;
-  for (auto [pos1, pos2, letter, password] : list) {
-    if ((password[pos1 - 1] == letter) ^ (password[pos2 - 1] == letter)) {
-      ++validPassword;
-    }
+int part1(const Map<short> &map) {
+  return getEncounteredTree(map, 3, 1);
+}
+
+long long part2(const Map<short> &map) {
+  std::vector<std::pair<size_t, size_t>> listSlope = {
+    {1, 1},
+    {3, 1},
+    {5, 1},
+    {7, 1},
+    {1, 2}};
+
+  long long res = 1;
+  for (auto [stepX, stepY] : listSlope) {
+    res *= getEncounteredTree(map, stepX, stepY);
   }
-  return validPassword;
+
+  return res;
 }
 
 
