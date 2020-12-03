@@ -43,6 +43,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/day1)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/day2)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/day3)
 
 SET(TEST_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/catch2-main.cpp
