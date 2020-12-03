@@ -3,9 +3,7 @@
 
 #include <exception>
 #include <fstream>
-#include <regex>
 #include <string>
-#include <tuple>
 #include <vector>
 
 namespace day3 {
@@ -20,22 +18,21 @@ public:
     return buffer[x % stride + y * stride];
   }
 
-  size_t stride;
-  size_t height;
+  size_t getHeight() const {
+    return height;
+  }
 
 private:
+  size_t height;
+  size_t stride;
   std::vector<T> buffer;
 };
 
 template <typename T>
 int getEncounteredTree(const Map<T> &map, size_t stepX, size_t stepY) {
   int count = 0;
-  size_t posX = 0;
-  size_t posY = 0;
-  while (posY < map.height) {
+  for (size_t posX = 0, posY = 0; posY < map.getHeight(); posX += stepX, posY += stepY) {
     count += map(posX, posY);
-    posX += stepX;
-    posY += stepY;
   }
   return count;
 }
@@ -59,7 +56,6 @@ long long part2(const Map<short> &map) {
 
   return res;
 }
-
 
 
 Map<short> parseInputFile(std::string filename) {
