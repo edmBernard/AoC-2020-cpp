@@ -66,10 +66,15 @@ SET(TEST_SOURCES
 add_executable(unit-test ${TEST_SOURCES} ${SOURCES})
 target_link_libraries(unit-test PRIVATE Catch2::Catch2)
 
-add_executable(benchmark ${CMAKE_CURRENT_SOURCE_DIR}/src/benchmark.cpp)
-target_link_libraries(benchmark PRIVATE fmt::fmt)
+add_executable(unit-benchmark ${CMAKE_CURRENT_SOURCE_DIR}/src/benchmark.cpp)
+target_link_libraries(unit-benchmark PRIVATE fmt::fmt)
 
 add_custom_target(test
   COMMAND unit-test
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/input
+)
+
+add_custom_target(benchmark
+  COMMAND unit-benchmark
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/input
 )
