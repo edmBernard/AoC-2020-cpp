@@ -43,8 +43,21 @@ int getEncounteredTree(const Map<T> &map, size_t stepX, size_t stepY) {
   return count;
 }
 
-int part1(int count) {
-  return count;
+int part1(const std::vector<std::map<std::string, std::string>> &passportList) {
+  int validPassport = 0;
+  for (auto pp : passportList) {
+    int fieldCount = 0;
+    std::map<std::string, int> passportCount;
+    for (auto [key, value] : pp) {
+      if (key != "cid") {
+        ++fieldCount;
+      }
+    }
+    if (fieldCount == 7) {
+      ++validPassport;
+    }
+  }
+  return validPassport;
 }
 
 long long part2(const Map<short> &map) {
@@ -63,27 +76,24 @@ long long part2(const Map<short> &map) {
   return res;
 }
 
-// std::vector<std::map<std::string, std::string>> parseInputFile(std::string filename) {
-int parseInputFile(std::string filename) {
+std::vector<std::map<std::string, std::string>> parseInputFile(std::string filename) {
   std::ifstream infile(filename);
   if (!infile.is_open()) {
     throw std::runtime_error("File Not Found : " + filename);
   }
 
-  std::vector<short> buffer;
   std::string line;
   std::string field;
   std::string key;
   std::string value;
 
-  std::vector<std::string> fieldList{"byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid", "cid"};
-  std::array<int, 8> foundField{{0,0,0,0,0,0,0, 1}};
-
-  int count = 0;
+  std::vector<std::map<std::string, std::string>> passportList;
+  std::map<std::string, std::string> passport;
   while (getline(infile, line)) {
     std::stringstream ssLine(line);
     if (line.empty()) {
-      foundField = {0,0,0,0,0,0,0, 1};
+      passportList.push_back(passport);
+      passport.clear();
       continue;
     }
     while (std::getline(ssLine, field, ' ')) {
@@ -91,26 +101,13 @@ int parseInputFile(std::string filename) {
 
       std::getline(ssField, key, ':');
       std::getline(ssField, value);
-      // std::cout << "key: " << key << std::endl;
-      // std::cout << "value: " << value << std::endl;
 
-      for (size_t index = 0; index < fieldList.size(); ++index) {
-        if (fieldList[index] == key) {
-          foundField[index] = 1;
-        }
-      }
-      // std::cout << foundField[0] << foundField[1] << foundField[2] << foundField[3] << foundField[4] << foundField[5] << foundField[6] << foundField[7] << std::endl;
-    }
-
-    int sum = 0;
-    sum = std::accumulate(foundField.begin() , foundField.end(), sum);
-    // std::cout << "sum: " << sum << std::endl;
-    if (sum == 8) {
-      count += 1;
-      foundField = {0,0,0,0,0,0,0, 1};
+      passport[key] = value;
     }
   }
-  return count;
+  passportList.push_back(passport);  // the last passport was not push by new line
+
+  return passportList;
 }
 
 } // namespace day3
