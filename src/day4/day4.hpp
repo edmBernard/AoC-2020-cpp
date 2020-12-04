@@ -10,38 +10,12 @@
 #include <algorithm>
 #include <array>
 #include <numeric>
+#include <set>
+#include <regex>
 
 
 namespace day4 {
 
-template <typename T>
-class Map {
-public:
-  Map(std::vector<T> &buffer, size_t stride, size_t height)
-      : buffer(buffer), stride(stride), height(height) {}
-
-  T operator()(size_t x, size_t y) const {
-    return buffer[x % stride + y * stride];
-  }
-
-  size_t getHeight() const {
-    return height;
-  }
-
-private:
-  size_t height;
-  size_t stride;
-  std::vector<T> buffer;
-};
-
-template <typename T>
-int getEncounteredTree(const Map<T> &map, size_t stepX, size_t stepY) {
-  int count = 0;
-  for (size_t posX = 0, posY = 0; posY < map.getHeight(); posX += stepX, posY += stepY) {
-    count += map(posX, posY);
-  }
-  return count;
-}
 
 int part1(const std::vector<std::map<std::string, std::string>> &passportList) {
   int validPassport = 0;
@@ -60,20 +34,92 @@ int part1(const std::vector<std::map<std::string, std::string>> &passportList) {
   return validPassport;
 }
 
-long long part2(const Map<short> &map) {
-  std::vector<std::pair<size_t, size_t>> listSlope = {
-    {1, 1},
-    {3, 1},
-    {5, 1},
-    {7, 1},
-    {1, 2}};
+int part2(const std::vector<std::map<std::string, std::string>> &passportList) {
+  int validPassport = 0;
+  for (auto pp : passportList) {
+    int fieldCount = 0;
+    for (auto [key, value] : pp) {
+      if (key == "byr") {
+        // byr (Birth Year) - four digits; at least 1920 and at most 2002.
+        if (int date = std::stoi(value); date >= 1920 && date <= 2002) {
+          ++fieldCount;
+        }
+        continue;
+      }
+      if (key == "iyr") {
+        // iyr (Issue Year) - four digits; at least 2010 and at most 2020.
+        if (int date = std::stoi(value); date >= 2010 && date <= 2020) {
+          ++fieldCount;
+        }
+        continue;
+      }
+      if (key == "eyr") {
+        // eyr (Expiration Year) - four digits; at least 2020 and at most 2030.
+        if (int date = std::stoi(value); date >= 2020 && date <= 2030) {
+          ++fieldCount;
+        }
+        continue;
+      }
+      if (key == "hgt") {
+        // hgt (Height) - a number followed by either cm or in:
+        // If cm, the number must be at least 150 and at most 193.
+        // If in, the number must be at least 59 and at most 76.
+        const std::regex parseRegex("([0-9]+)(in|cm)");
+        std::smatch match;
+        if (std::regex_match(value, match, parseRegex) && match.size() == 3) {
+          const int height = std::stoi(match[1]);
+          const std::string unit = match[2].str();
+          if (unit == "in" && height >= 59 && height <= 76) {
+            ++fieldCount;
+          } else if (unit == "cm" && height >= 150 && height <= 193) {
+            ++fieldCount;
+          }
+        }
+        continue;
+      }
+      if (key == "hcl") {
+        // hcl (Hair Color) - a # followed by exactly six characters 0-9 or a-f.
+        if (value.size() == 7 && value[0] == '#') {
+          const std::set<char> validChar = {'#', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+          bool hasInvalidChar = false;
+          for (char c : value) {
+            if (!validChar.count(c)) {
+              hasInvalidChar = true;
+            }
+          }
+          if (!hasInvalidChar) {
+            ++fieldCount;
+          }
+        }
+        continue;
+      }
+      if (key == "ecl") {
+        // ecl (Eye Color) - exactly one of: amb blu brn gry grn hzl oth.
+        const std::set<std::string> eyeColor = {"amb", "blu", "brn", "gry", "grn", "hzl", "oth"};
+        if (eyeColor.count(value)) {
+          ++fieldCount;
+        }
+        continue;
+      }
+      if (key == "pid") {
+        try {
+          if (long long id = std::stoll(value); id > 0 && value.size() == 9) {
+            ++fieldCount;
+          }
+        } catch (const std::invalid_argument&){
+        }
+        continue;
+      }
+      if (key == "cid") {
+        // cid (Country ID) - ignored, missing or not.
+      }
 
-  long long res = 1;
-  for (auto [stepX, stepY] : listSlope) {
-    res *= getEncounteredTree(map, stepX, stepY);
+    }
+    if (fieldCount == 7) {
+      ++validPassport;
+    }
   }
-
-  return res;
+  return validPassport;
 }
 
 std::vector<std::map<std::string, std::string>> parseInputFile(std::string filename) {

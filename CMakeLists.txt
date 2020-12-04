@@ -36,7 +36,7 @@ SET(SOURCES
 #**************************************************************************************************
 # Set compiler ************************************************************************************
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-  add_compile_options(/std:c++17 /W4)
+  add_compile_options(/std:c++17)
 else()
   add_compile_options(-std=c++2a -fPIC -O3)
 endif()
