@@ -1,21 +1,21 @@
 
 #pragma once
 
-#include <exception>
-#include <fstream>
-#include <string>
-#include <vector>
-#include <sstream>
-#include <map>
 #include <algorithm>
 #include <array>
+#include <charconv>
+#include <exception>
+#include <fstream>
+#include <map>
 #include <numeric>
-#include <set>
 #include <regex>
-
+#include <set>
+#include <sstream>
+#include <string>
+#include <string_view>
+#include <vector>
 
 namespace day4 {
-
 
 int part1(const std::vector<std::map<std::string, std::string>> &passportList) {
   int validPassport = 0;
@@ -38,7 +38,7 @@ int part2(const std::vector<std::map<std::string, std::string>> &passportList) {
   int validPassport = 0;
   for (auto pp : passportList) {
     int fieldCount = 0;
-    for (auto [key, value] : pp) {
+    for (const auto &[key, value] : pp) {
       if (key == "byr") {
         // byr (Birth Year) - four digits; at least 1920 and at most 2002.
         if (int date = std::stoi(value); date >= 1920 && date <= 2002) {
@@ -64,6 +64,23 @@ int part2(const std::vector<std::map<std::string, std::string>> &passportList) {
         // hgt (Height) - a number followed by either cm or in:
         // If cm, the number must be at least 150 and at most 193.
         // If in, the number must be at least 59 and at most 76.
+
+#ifdef USE_OPTIMIZED_VERSION
+        const char lastChar = value[value.size() - 1];
+        if (lastChar == 'n') {
+          int height;
+          auto [p, ec] = std::from_chars(value.data(), value.data() + value.size() - 2, height);
+          if (ec == std::errc() && height >= 59 && height <= 76) {
+            ++fieldCount;
+          }
+        } else if (lastChar == 'm') {
+          int height;
+          auto [p, ec] = std::from_chars(value.data(), value.data() + value.size() - 2, height);
+          if (ec == std::errc() && height >= 150 && height <= 193) {
+            ++fieldCount;
+          }
+        }
+#else
         const std::regex parseRegex("([0-9]+)(in|cm)");
         std::smatch match;
         if (std::regex_match(value, match, parseRegex) && match.size() == 3) {
@@ -75,6 +92,7 @@ int part2(const std::vector<std::map<std::string, std::string>> &passportList) {
             ++fieldCount;
           }
         }
+#endif
         continue;
       }
       if (key == "hcl") {
@@ -102,18 +120,25 @@ int part2(const std::vector<std::map<std::string, std::string>> &passportList) {
         continue;
       }
       if (key == "pid") {
+#ifdef USE_OPTIMIZED_VERSION
+        long long pid;
+        auto [p, ec] = std::from_chars(value.data(), value.data() + value.size(), pid);
+        if (ec == std::errc() && pid > 0 && value.size() == 9) {
+          ++fieldCount;
+        }
+#else
         try {
           if (long long id = std::stoll(value); id > 0 && value.size() == 9) {
             ++fieldCount;
           }
-        } catch (const std::invalid_argument&){
+        } catch (const std::invalid_argument &) {
         }
+#endif
         continue;
       }
       if (key == "cid") {
         // cid (Country ID) - ignored, missing or not.
       }
-
     }
     if (fieldCount == 7) {
       ++validPassport;
@@ -151,9 +176,9 @@ std::vector<std::map<std::string, std::string>> parseInputFile(std::string filen
       passport[key] = value;
     }
   }
-  passportList.push_back(passport);  // the last passport was not push by new line
+  passportList.push_back(passport); // the last passport was not push by new line
 
   return passportList;
 }
 
-} // namespace day3
+} // namespace day4
