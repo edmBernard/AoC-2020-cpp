@@ -14,7 +14,7 @@ TEST_CASE("AoC2020 Day4", "[day4]") {
       std::make_tuple("day4/input.txt", 260, 153)
     }));
 
-  std::vector<std::map<std::string, std::string>> res = day4::parseInputFile(filename);
+  std::vector<std::pair<int, std::array<std::string, 8>>> res = day4::parseInputFile(filename);
 
   SECTION("Part1 : " + filename) {
     CHECK(day4::part1(res) == expectedPart1);
