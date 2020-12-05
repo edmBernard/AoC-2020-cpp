@@ -14,12 +14,14 @@ TEST_CASE("AoC2020 Day4", "[day4]") {
       std::make_tuple("day4/input.txt", 260, 153)
     }));
 
-  std::vector<std::pair<int, std::array<std::string, 8>>> res = day4::parseInputFile(filename);
-
-  SECTION("Part1 : " + filename) {
+  SECTION("Separated : " + filename) {
+    auto res = day4::parseInputFile(filename);
     CHECK(day4::part1(res) == expectedPart1);
-  }
-  SECTION("Part2 : " + filename) {
     CHECK(day4::part2(res) == expectedPart2);
+  }
+  SECTION("All in one : " + filename) {
+    auto [part1, part2] = day4::allInOne(filename);
+    CHECK(part1 == expectedPart1);
+    CHECK(part1 == expectedPart1);
   }
 }
