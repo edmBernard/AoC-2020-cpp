@@ -30,7 +30,7 @@ enum FIELD {
 
 int part1(const std::vector<std::pair<int, std::array<std::string, 8>>> &passportList) {
   int validPassport = 0;
-  for (auto [flag, content] : passportList) {
+  for (const auto& [flag, content] : passportList) {
     if ((flag | FIELD::CID) == 255.) {
       ++validPassport;
     }
@@ -40,7 +40,7 @@ int part1(const std::vector<std::pair<int, std::array<std::string, 8>>> &passpor
 
 int part2(const std::vector<std::pair<int, std::array<std::string, 8>>> &passportList) {
   int validPassport = 0;
-  for (auto [flag, content] : passportList) {
+  for (const auto& [flag, content] : passportList) {
     int fieldCount = 0;
 
     if (flag & FIELD::BYR) {
@@ -85,7 +85,7 @@ int part2(const std::vector<std::pair<int, std::array<std::string, 8>>> &passpor
       // hcl (Hair Color) - a # followed by exactly six characters 0-9 or a-f.
       const std::string_view value = content[4];
       if (value.size() == 7 && value[0] == '#') {
-        const std::set<char> validChar = {'#', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+        static const std::set<char> validChar = {'#', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
         bool hasInvalidChar = false;
         for (char c : value) {
           if (!validChar.count(c)) {
@@ -99,7 +99,7 @@ int part2(const std::vector<std::pair<int, std::array<std::string, 8>>> &passpor
     }
     if (flag & FIELD::ECL) {
       // ecl (Eye Color) - exactly one of: amb blu brn gry grn hzl oth.
-      const std::set<std::string> eyeColor = {"amb", "blu", "brn", "gry", "grn", "hzl", "oth"};
+      static const std::set<std::string> eyeColor = {"amb", "blu", "brn", "gry", "grn", "hzl", "oth"};
       if (eyeColor.count(content[5])) {
         ++fieldCount;
       }
