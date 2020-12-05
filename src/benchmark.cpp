@@ -6,6 +6,7 @@
 #include "day2/day2.hpp"
 #include "day3/day3.hpp"
 #include "day4/day4.hpp"
+#include "day5/day5.hpp"
 
 // Temporary until I find a nicer solution without macro :(
 #define BENCH(x)                                                                                                     \
@@ -23,12 +24,13 @@
 int main() {
 
   double totalCount = 0;
-  const int repetition = 1000;
+  const int repetition = 100;
 
   BENCH(1);
   BENCH(2);
   BENCH(3);
   BENCH(4);
+  BENCH(5);
 
   fmt::print("Total duration per run : {:.2f} ms \n", totalCount / repetition);
 
