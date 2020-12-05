@@ -28,15 +28,12 @@ enum FIELD {
   CID = 1 << 7
 };
 
-using Passport = std::pair<int, std::array<std::string, 8>>;
-
 bool haveAllField(int flag) {
   return (flag | FIELD::CID) == 255.;
 }
 
-bool haveAllFieldValid(const Passport &passport) {
+bool haveAllFieldValid(int flag, const std::array<std::string, 8> &content) {
   int fieldCount = 0;
-  const auto &[flag, content] = passport;
   if (flag & FIELD::BYR) {
     // byr (Birth Year) - four digits; at least 1920 and at most 2002.
     if (int date = std::stoi(content[0]); date >= 1920 && date <= 2002) {
@@ -79,7 +76,7 @@ bool haveAllFieldValid(const Passport &passport) {
     // hcl (Hair Color) - a # followed by exactly six characters 0-9 or a-f.
     const std::string_view value = content[4];
     if (value.size() == 7 && value[0] == '#') {
-      const std::set<char> validChar = {'#', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+      static const std::set<char> validChar = {'#', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
       bool hasInvalidChar = false;
       for (char c : value) {
         if (!validChar.count(c)) {
@@ -93,7 +90,7 @@ bool haveAllFieldValid(const Passport &passport) {
   }
   if (flag & FIELD::ECL) {
     // ecl (Eye Color) - exactly one of: amb blu brn gry grn hzl oth.
-    const std::set<std::string> eyeColor = {"amb", "blu", "brn", "gry", "grn", "hzl", "oth"};
+    static const std::set<std::string> eyeColor = {"amb", "blu", "brn", "gry", "grn", "hzl", "oth"};
     if (eyeColor.count(content[5])) {
       ++fieldCount;
     }
@@ -142,7 +139,7 @@ std::tuple<int, int> parseInputFile(std::string filename) {
     if (line.empty()) {
       if (haveAllField(flag)) {
         ++part1;
-        if (haveAllFieldValid({flag, fieldContent})) {
+        if (haveAllFieldValid(flag, fieldContent)) {
           ++part2;
         }
       }
@@ -184,7 +181,7 @@ std::tuple<int, int> parseInputFile(std::string filename) {
   }
   if (haveAllField(flag)) {
     ++part1;
-    if (haveAllFieldValid({flag, fieldContent})) {
+    if (haveAllFieldValid(flag, fieldContent)) {
       ++part2;
     }
   }
