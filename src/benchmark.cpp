@@ -40,16 +40,17 @@
 int main() {
 
   double totalCount = 0;
-  const int repetition = 100;
 
+  const int repetition = 100;
   BENCH_SPLIT(1);
   BENCH_SPLIT(2);
   BENCH_SPLIT(3);
   BENCH_SPLIT(4);
-  BENCH(4);
   BENCH_SPLIT(5);
 
-  fmt::print("Total duration per run : {:.2f} ms \n", totalCount / repetition);
+  fmt::print("Total duration per run : {:.2f} ms \n\n", totalCount / repetition);
+
+  BENCH(4);
 
   return 0;
 }
