@@ -67,4 +67,4 @@ std::vector<int> parseInputFile(std::string filename) {
   return boardingPassIDs;
 }
 
-} // namespace day4
+} // namespace day5

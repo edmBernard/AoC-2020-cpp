@@ -36,7 +36,8 @@ SET(SOURCES
 #**************************************************************************************************
 # Set compiler ************************************************************************************
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-  add_compile_options(/std:c++17)
+  add_compile_options(/std:c++17 /Oy)
+  # add_compile_options(/std:c++17 /Oy)
 else()
   add_compile_options(-std=c++2a -fPIC -O3)
 endif()
@@ -55,6 +56,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/day2)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/day3)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/day4)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/day5)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/day6)
 
 SET(TEST_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/catch2-main.cpp
@@ -63,6 +65,7 @@ SET(TEST_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/day3-catch2.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/day4-catch2.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/day5-catch2.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/day6-catch2.cpp
 )
 
 add_executable(unit-test ${TEST_SOURCES} ${SOURCES})
