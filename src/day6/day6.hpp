@@ -19,7 +19,7 @@ namespace day6 {
 
 
 int part1(const std::vector<std::array<int, 27>> &answerList) {
-  int count = 0; c
+  int count = 0;
   for (const auto& answer : answerList) {
     count -= 1;
     for (const auto & letter : answer) {
