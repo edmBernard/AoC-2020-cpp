@@ -17,22 +17,31 @@
 
 namespace day7 {
 
+void findUpperContainer(std::set<std::string> &output, std::string search, const std::multimap<std::string, std::string> &dependencyGraph) {
+  auto range = dependencyGraph.equal_range(search);
+  for (auto it = range.first; it != range.second; ++it){
+    if (!output.count(it->second)) {
+      output.insert(it->second);
+      findUpperContainer(output, it->second, dependencyGraph);
+    }
+  }
+}
 
-int part1(const std::map<std::string, std::string> &dependencyGraph) {
+int part1(const std::multimap<std::string, std::string> &dependencyGraph) {
+  std::set<std::string> res;
+  findUpperContainer(res, "shiny gold", dependencyGraph);
+  return res.size();
+}
+
+
+int part2(const std::multimap<std::string, std::string> &answerList) {
   int count = 0;
 
   return count;
 }
 
 
-int part2(const std::vector<std::array<int, 27>> &answerList) {
-  int count = 0;
-
-  return count;
-}
-
-
-std::map<std::string, std::string> parseInputFile(std::string filename) {
+std::multimap<std::string, std::string> parseInputFile(std::string filename) {
   std::ifstream infile(filename);
   if (!infile.is_open()) {
     throw std::runtime_error("File Not Found : " + filename);
@@ -40,13 +49,12 @@ std::map<std::string, std::string> parseInputFile(std::string filename) {
 
   std::string line;
 
-  std::regex regexFullLine("(.*) contain(.*)$");
-  std::regex regexContainedBag(" ([0-9]+) ([^0-9.,]+)[.,]");
+  std::regex regexFullLine("(.*) bags contain(.*)$");
+  std::regex regexContainedBag(" ([0-9]+) ([^0-9.,]+) bags?[.,]");
   std::smatch matchContainer;
   std::smatch matchContained;
   std::multimap<std::string, std::string> dependencyGraph;
   while (getline(infile, line)) {
-    std::cout << "new line : " << std::endl;
     if (std::regex_match(line, matchContainer, regexFullLine)) {
 
       const auto words_begin = std::sregex_iterator(line.begin(), line.end(), regexContainedBag);
@@ -64,7 +72,7 @@ std::map<std::string, std::string> parseInputFile(std::string filename) {
   for (auto & e : dependencyGraph) {
     std::cout << "{" << e.first << "->" << e.second << "} ";
   }
-  return {};
+  return dependencyGraph;
 }
 
 

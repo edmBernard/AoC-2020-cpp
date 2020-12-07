@@ -67,6 +67,7 @@ SET(TEST_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/day4-catch2.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/day5-catch2.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/day6-catch2.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/day7-catch2.cpp
 )
 
 add_executable(unit-test ${TEST_SOURCES} ${SOURCES})
