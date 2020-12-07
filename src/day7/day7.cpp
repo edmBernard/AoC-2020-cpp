@@ -8,7 +8,7 @@ int main(int, const char **argv) try {
   std::cout << "Input File : " << argv[1] << std::endl;
 
   std::cout << "Result part1: " << part1(parseInputFile(argv[1])) << std::endl;
-  // std::cout << "Result part2: " << part2(parseInputFile(argv[1])) << std::endl;
+  std::cout << "Result part2: " << part2(parseInputFile(argv[1])) << std::endl;
 
   return 0;
 

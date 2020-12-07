@@ -27,21 +27,31 @@ void findUpperContainer(std::set<std::string> &output, std::string search, const
   }
 }
 
-int part1(const std::multimap<std::string, std::string> &dependencyGraph) {
+int part1(const std::tuple<std::multimap<std::string, std::string>, std::multimap<std::string, std::pair<int, std::string>>> &dependencyGraph) {
   std::set<std::string> res;
-  findUpperContainer(res, "shiny gold", dependencyGraph);
+  findUpperContainer(res, "shiny gold", std::get<0>(dependencyGraph));
   return res.size();
 }
 
-
-int part2(const std::multimap<std::string, std::string> &answerList) {
-  int count = 0;
+int findDownContainer(std::string search, const std::multimap<std::string, std::pair<int, std::string>> &dependencyGraph) {
+  if (search.empty()) {
+    return 0;
+  }
+  auto range = dependencyGraph.equal_range(search);
+  int count = 1;
+  for (auto it = range.first; it != range.second; ++it){
+    count += it->second.first * findDownContainer(it->second.second, dependencyGraph);
+  }
 
   return count;
 }
 
+int part2(const std::tuple<std::multimap<std::string, std::string>, std::multimap<std::string, std::pair<int, std::string>>> &dependencyGraph) {
+  return findDownContainer("shiny gold", std::get<1>(dependencyGraph)) - 1; // Remove the shiny gold bag
+}
 
-std::multimap<std::string, std::string> parseInputFile(std::string filename) {
+
+std::tuple<std::multimap<std::string, std::string>, std::multimap<std::string, std::pair<int, std::string>>> parseInputFile(std::string filename) {
   std::ifstream infile(filename);
   if (!infile.is_open()) {
     throw std::runtime_error("File Not Found : " + filename);
@@ -54,25 +64,25 @@ std::multimap<std::string, std::string> parseInputFile(std::string filename) {
   std::smatch matchContainer;
   std::smatch matchContained;
   std::multimap<std::string, std::string> dependencyGraph;
+  std::multimap<std::string, std::pair<int, std::string>> dependencyGraph2;
   while (getline(infile, line)) {
     if (std::regex_match(line, matchContainer, regexFullLine)) {
 
       const auto words_begin = std::sregex_iterator(line.begin(), line.end(), regexContainedBag);
       const auto words_end = std::sregex_iterator();
-
+      if (words_begin == words_end) {
+        dependencyGraph2.insert({matchContainer[1].str(), {1, ""}});
+      }
       for (std::sregex_iterator i = words_begin; i != words_end; ++i) {
           matchContained = *i;
-          for (int i = 1; i < matchContained.size(); ++i) {
-            dependencyGraph.insert({matchContained[2].str(), matchContainer[1].str()});
-          }
+          dependencyGraph.insert({matchContained[2].str(), matchContainer[1].str()});
+          dependencyGraph2.insert({matchContainer[1].str(), {std::stoi(matchContained[1].str()), matchContained[2].str()}});
       }
 
     }
   }
-  for (auto & e : dependencyGraph) {
-    std::cout << "{" << e.first << "->" << e.second << "} ";
-  }
-  return dependencyGraph;
+
+  return {dependencyGraph, dependencyGraph2};
 }
 
 
