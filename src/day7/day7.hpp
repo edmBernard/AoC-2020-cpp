@@ -30,7 +30,7 @@ void findUpperContainer(std::set<std::string> &output, std::string search, const
 int part1(const std::tuple<std::multimap<std::string, std::string>, std::multimap<std::string, std::pair<int, std::string>>> &dependencyGraph) {
   std::set<std::string> res;
   findUpperContainer(res, "shiny gold", std::get<0>(dependencyGraph));
-  return res.size();
+  return int(res.size());
 }
 
 int findDownContainer(std::string search, const std::multimap<std::string, std::pair<int, std::string>> &dependencyGraph) {

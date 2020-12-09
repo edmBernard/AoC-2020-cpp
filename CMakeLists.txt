@@ -37,7 +37,6 @@ SET(SOURCES
 # Set compiler ************************************************************************************
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
   add_compile_options(/std:c++17 /Oy)
-  # add_compile_options(/std:c++17 /Oy)
 else()
   add_compile_options(-std=c++2a -fPIC -O3)
 endif()
@@ -59,6 +58,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/day5)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/day6)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/day7)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/day8)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/day9)
 
 SET(TEST_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/catch2-main.cpp
@@ -70,12 +70,15 @@ SET(TEST_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/day6-catch2.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/day7-catch2.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/day8-catch2.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/day9-catch2.cpp
 )
 
 add_executable(unit-test ${TEST_SOURCES} ${SOURCES})
+set_property(TARGET unit-test PROPERTY CXX_STANDARD 20)
 target_link_libraries(unit-test PRIVATE Catch2::Catch2)
 
 add_executable(unit-benchmark ${CMAKE_CURRENT_SOURCE_DIR}/src/benchmark.cpp)
+set_property(TARGET unit-benchmark PROPERTY CXX_STANDARD 20)
 target_link_libraries(unit-benchmark PRIVATE fmt::fmt)
 
 add_custom_target(test
