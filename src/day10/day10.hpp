@@ -9,6 +9,7 @@
 
 namespace day10 {
 
+
 size_t part1(const std::vector<size_t> &list) {
   std::vector<size_t> sorted(list.begin(), list.end());
   std::sort(sorted.begin(), sorted.end());
@@ -40,17 +41,34 @@ size_t part1(const std::vector<size_t> &list) {
   return diff1 * diff3;
 }
 
-size_t part2(const std::vector<size_t> &list) {
-  for (auto l1 : list) {
-    for (auto l2 : list) {
-      for (auto l3 : list) {
-        if (l1 + l2 + l3 == 2020) {
-          return l1 * l2 * l3;
-        }
-      }
+size_t branching(const std::vector<size_t> &list, size_t index) {
+  // Fibonacci-like serie
+  std::vector<size_t> branchingList(list.size(), 0);
+  branchingList[index] = 1;
+  for (index; index < list.size() - 1; ++index) {
+    // Jump over 2
+    if (index + 3 < list.size() && list[index+3] - list[index] <= 3) {
+      branchingList[index+3] += branchingList[index];
     }
+    // Jump over 1
+    if (index + 2 < list.size() && list[index+2] - list[index] <= 3) {
+      branchingList[index+2] += branchingList[index];
+    }
+    // no Jump
+    branchingList[index+1] += branchingList[index];
   }
-  return 0;
+
+  return branchingList[branchingList.size()-1];
+
+}
+
+
+size_t part2(const std::vector<size_t> &list) {
+  std::vector<size_t> sorted(list.begin(), list.end());
+  std::sort(sorted.begin(), sorted.end());
+  sorted.insert(sorted.begin(), 0);
+
+  return branching(sorted, 0);
 }
 
 std::vector<size_t> parseInputFile(std::string filename) {
