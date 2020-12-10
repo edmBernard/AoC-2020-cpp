@@ -35,10 +35,12 @@ int64_t part1(const std::vector<int64_t> &numbers, size_t preamble = 25) {
 
 int64_t part2(const std::vector<int64_t> &numbers, size_t preamble = 25) {
   int64_t invalidNumber = part1(numbers, preamble);
-  for (auto it = numbers.begin(); it < numbers.end(); ++it) {
-    for (size_t i = 0; i < size_t(numbers.end() - it); ++i) {
-      if (std::accumulate(it, it + i, int64_t(0)) == invalidNumber) {
-        auto [min, max] = std::minmax_element(it, it + i);
+  for (auto it = numbers.begin(); it != numbers.end(); ++it) {
+    int64_t acc = 0;
+    for (auto it2 = it; it2 != numbers.end(); ++it2) {
+      acc += *it2;
+      if (acc == invalidNumber) {
+        auto [min, max] = std::minmax_element(it, it2);
         return *min + *max;
       }
     }
