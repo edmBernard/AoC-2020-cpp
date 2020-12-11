@@ -16,18 +16,18 @@ public:
       : grid(grid) {
   }
 
-  bool isInside(int64_t x, int64_t y) {
+  bool isInside(int64_t x, int64_t y) const {
     return refX + x >= 0 && refY + y >= 0 && refX + x < grid[0].size() && refY + y < grid.size();
   }
 
-  int operator()(int64_t x, int64_t y) {
+  int operator()(int64_t x, int64_t y) const {
     if (!isInside(x, y)) {
       return 0;
     }
     return grid[refY + y][refX + x];
   }
 
-  int occupied(int64_t x, int64_t y) {
+  int occupied(int64_t x, int64_t y) const {
     if (!isInside(x, y)) {
       return 0;
     }
@@ -35,7 +35,7 @@ public:
     return occupied > 0 ? occupied : 0;
   }
 
-  int seenOccupied(int64_t dirx, int64_t diry) {
+  int seenOccupied(int64_t dirx, int64_t diry) const {
     int64_t x = dirx;
     int64_t y = diry;
     while (isInside(x, y)) {
@@ -60,12 +60,12 @@ private:
 
 size_t part1(const std::vector<std::vector<int>> &grid) {
   std::vector<std::vector<int>> previousGrid(grid.begin(), grid.end());
+  std::vector<std::vector<int>> nextGrid(previousGrid.begin(), previousGrid.end());
+  GridAccessor Acc(previousGrid);
 
   bool haveChanged = true;
   while (haveChanged) {
     haveChanged = false;
-    GridAccessor Acc(previousGrid);
-    std::vector<std::vector<int>> nextGrid(previousGrid.begin(), previousGrid.end());
 
     for (Acc.refY = 0; Acc.refY < previousGrid.size(); Acc.refY++) {
       for (Acc.refX = 0; Acc.refX < previousGrid[0].size(); Acc.refX++) {
@@ -120,12 +120,12 @@ size_t part1(const std::vector<std::vector<int>> &grid) {
 
 size_t part2(const std::vector<std::vector<int>> &grid) {
   std::vector<std::vector<int>> previousGrid(grid.begin(), grid.end());
+  std::vector<std::vector<int>> nextGrid(previousGrid.begin(), previousGrid.end());
+  GridAccessor Acc(previousGrid);
 
   bool haveChanged = true;
   while (haveChanged) {
     haveChanged = false;
-    GridAccessor Acc(previousGrid);
-    std::vector<std::vector<int>> nextGrid(previousGrid.begin(), previousGrid.end());
 
     for (Acc.refY = 0; Acc.refY < previousGrid.size(); Acc.refY++) {
       for (Acc.refX = 0; Acc.refX < previousGrid[0].size(); Acc.refX++) {
