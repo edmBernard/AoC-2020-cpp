@@ -40,17 +40,12 @@ public:
   }
 
   int occupiedInSight(int64_t dirx, int64_t diry) const {
-    int64_t x = dirx;
-    int64_t y = diry;
-    while (isInside(x, y)) {
-      if (this->operator()(x, y) > 0) {
+    for (int64_t x = dirx, y = diry; isInside(x, y); x += dirx, y += diry) {
+      if (this->operator()(x, y) == 1) {
         return 1;
-      }
-      if (this->operator()(x, y) == 0) {
+      } else if (this->operator()(x, y) == 0) {
         return 0;
       }
-      x += dirx;
-      y += diry;
     }
     return 0;
   }
@@ -89,9 +84,7 @@ size_t part1(const std::vector<std::vector<int>> &grid) {
           nextGrid[prev.refY][prev.refX] = 1;
           haveChanged = true;
           continue;
-        }
-
-        if (prev(0, 0) == 1 && occupiedNeighbour > 3) {
+        } else  if (prev(0, 0) == 1 && occupiedNeighbour > 3) {
           // if occupied seat
           nextGrid[prev.refY][prev.refX] = 0;
           haveChanged = true;
@@ -119,7 +112,7 @@ size_t part1(const std::vector<std::vector<int>> &grid) {
   size_t count = 0;
   for (auto row : previousGrid) {
     for (auto elem : row) {
-      count += elem > 0 ? 1 : 0;
+      count += elem == 1 ? 1 : 0;
     }
   }
   return count;
@@ -148,14 +141,10 @@ size_t part2(const std::vector<std::vector<int>> &grid) {
           // if not occupied seat
           nextGrid[prev.refY][prev.refX] = 1;
           haveChanged = true;
-          continue;
-        }
-
-        if (prev(0, 0) == 1 && occupiedNeighbour > 4) {
+        } else if (prev(0, 0) == 1 && occupiedNeighbour > 4) {
           // if occupied seat
           nextGrid[prev.refY][prev.refX] = 0;
           haveChanged = true;
-          continue;
         }
       }
     }
@@ -173,13 +162,12 @@ size_t part2(const std::vector<std::vector<int>> &grid) {
     // }
     // std::cout << std::endl;
     previousGrid = nextGrid;
-
   }
 
   size_t count = 0;
   for (auto row : previousGrid) {
     for (auto elem : row) {
-      count += elem > 0 ? 1 : 0;
+      count += elem == 1 ? 1 : 0;
     }
   }
   return count;
