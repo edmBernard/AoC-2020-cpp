@@ -16,7 +16,7 @@ public:
       : grid(grid), height(grid.size()), width(grid[0].size()) {
   }
 
-  bool isInside(int64_t x, int64_t y) const {
+  inline bool isInside(int64_t x, int64_t y) const {
     return refX + x >= 0 & refY + y >= 0 & refX + x < width & refY + y < height;
   }
 
@@ -42,7 +42,7 @@ public:
   int occupiedInSight(int64_t dirx, int64_t diry) const {
     for (int64_t x = dirx, y = diry; isInside(x, y); x += dirx, y += diry) {
       if (grid[refY + y][refX + x] != -1) {
-        return this->operator()(x, y);
+        return grid[refY + y][refX + x];
       }
     }
     return 0;
