@@ -39,7 +39,7 @@ public:
     return occupied > 0 ? occupied : 0;
   }
 
-  int seenOccupied(int64_t dirx, int64_t diry) const {
+  int occupiedInSight(int64_t dirx, int64_t diry) const {
     int64_t x = dirx;
     int64_t y = diry;
     while (isInside(x, y)) {
@@ -142,7 +142,7 @@ size_t part2(const std::vector<std::vector<int>> &grid) {
           continue;
         }
 
-        const int occupiedNeighbour = prev.seenOccupied(-1, -1) + prev.seenOccupied(0, -1) + prev.seenOccupied(1, -1) + prev.seenOccupied(-1, 0) + prev.seenOccupied(1, 0) + prev.seenOccupied(-1, 1) + prev.seenOccupied(0, 1) + prev.seenOccupied(1, 1);
+        const int occupiedNeighbour = prev.occupiedInSight(-1, -1) + prev.occupiedInSight(0, -1) + prev.occupiedInSight(1, -1) + prev.occupiedInSight(-1, 0) + prev.occupiedInSight(1, 0) + prev.occupiedInSight(-1, 1) + prev.occupiedInSight(0, 1) + prev.occupiedInSight(1, 1);
 
         if (prev(0, 0) == 0 && occupiedNeighbour == 0) {
           // if not occupied seat
