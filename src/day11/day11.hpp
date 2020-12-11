@@ -41,10 +41,8 @@ public:
 
   int occupiedInSight(int64_t dirx, int64_t diry) const {
     for (int64_t x = dirx, y = diry; isInside(x, y); x += dirx, y += diry) {
-      if (this->operator()(x, y) == 1) {
-        return 1;
-      } else if (this->operator()(x, y) == 0) {
-        return 0;
+      if (this->operator()(x, y) != -1) {
+        return this->operator()(x, y);
       }
     }
     return 0;
