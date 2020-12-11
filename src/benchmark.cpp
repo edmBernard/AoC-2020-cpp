@@ -47,7 +47,7 @@ int main() {
 
   double totalCount = 0;
 
-  const int repetition = 10;
+  const int repetition = 100;
   BENCH_SPLIT(1);
   BENCH_SPLIT(2);
   BENCH_SPLIT(3);

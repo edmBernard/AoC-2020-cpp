@@ -13,17 +13,21 @@ namespace day11 {
 class GridAccessor {
 public:
   GridAccessor(std::vector<std::vector<int>> &grid)
-      : grid(grid) {
+      : grid(grid), height(grid.size()), width(grid[0].size()) {
   }
 
   bool isInside(int64_t x, int64_t y) const {
-    return refX + x >= 0 && refY + y >= 0 && refX + x < grid[0].size() && refY + y < grid.size();
+    return refX + x >= 0 && refY + y >= 0 && refX + x < width && refY + y < height;
   }
 
-  int operator()(int64_t x, int64_t y) const {
+  const int& operator()(int64_t x, int64_t y) const {
     if (!isInside(x, y)) {
-      return 0;
+      return padding;
     }
+    return grid[refY + y][refX + x];
+  }
+
+  int& operator()(int64_t x, int64_t y) {
     return grid[refY + y][refX + x];
   }
 
@@ -53,40 +57,43 @@ public:
 
   int64_t refX = 0;
   int64_t refY = 0;
+  const size_t height;
+  const size_t width;
 
 private:
+  const int padding = 0;
   std::vector<std::vector<int>> &grid;
 };
 
 size_t part1(const std::vector<std::vector<int>> &grid) {
   std::vector<std::vector<int>> previousGrid(grid.begin(), grid.end());
   std::vector<std::vector<int>> nextGrid(previousGrid.begin(), previousGrid.end());
-  GridAccessor Acc(previousGrid);
+  GridAccessor prev(previousGrid);
 
   bool haveChanged = true;
   while (haveChanged) {
     haveChanged = false;
 
-    for (Acc.refY = 0; Acc.refY < previousGrid.size(); Acc.refY++) {
-      for (Acc.refX = 0; Acc.refX < previousGrid[0].size(); Acc.refX++) {
+    for (prev.refY = 0; prev.refY < prev.height; prev.refY++) {
+      for (prev.refX = 0; prev.refX < prev.width; prev.refX++) {
 
-        if (Acc(0, 0) < 0) {
+        if (prev(0, 0) < 0) {
           // if no seat
           continue;
         }
 
-        const int occupiedNeighbour = Acc.occupied(-1, -1) + Acc.occupied(0, -1) + Acc.occupied(1, -1) + Acc.occupied(-1, 0) + Acc.occupied(1, 0) + Acc.occupied(-1, 1) + Acc.occupied(0, 1) + Acc.occupied(1, 1);
+        const int occupiedNeighbour = prev.occupied(-1, -1) + prev.occupied(0, -1) + prev.occupied(1, -1) + prev.occupied(-1, 0) + prev.occupied(1, 0) + prev.occupied(-1, 1) + prev.occupied(0, 1) + prev.occupied(1, 1);
 
-        if (Acc(0, 0) == 0 && occupiedNeighbour == 0) {
+        if (prev(0, 0) == 0 && occupiedNeighbour == 0) {
           // if not occupied seat
-          nextGrid[Acc.refY][Acc.refX] = 1;
+          nextGrid[prev.refY][prev.refX] = 1;
           haveChanged = true;
           continue;
         }
 
-        if (Acc(0, 0) == 1 && occupiedNeighbour > 3) {
+        if (prev(0, 0) == 1 && occupiedNeighbour > 3) {
           // if occupied seat
-          nextGrid[Acc.refY][Acc.refX] = 0;
+          nextGrid[prev.refY][prev.refX] = 0;
           haveChanged = true;
           continue;
         }
@@ -121,32 +128,32 @@ size_t part1(const std::vector<std::vector<int>> &grid) {
 size_t part2(const std::vector<std::vector<int>> &grid) {
   std::vector<std::vector<int>> previousGrid(grid.begin(), grid.end());
   std::vector<std::vector<int>> nextGrid(previousGrid.begin(), previousGrid.end());
-  GridAccessor Acc(previousGrid);
+  GridAccessor prev(previousGrid);
 
   bool haveChanged = true;
   while (haveChanged) {
     haveChanged = false;
 
-    for (Acc.refY = 0; Acc.refY < previousGrid.size(); Acc.refY++) {
-      for (Acc.refX = 0; Acc.refX < previousGrid[0].size(); Acc.refX++) {
+    for (prev.refY = 0; prev.refY < prev.height; ++prev.refY) {
+      for (prev.refX = 0; prev.refX < prev.width; ++prev.refX) {
 
-        if (Acc(0, 0) < 0) {
+        if (prev(0, 0) < 0) {
           // if no seat
           continue;
         }
 
-        const int occupiedNeighbour = Acc.seenOccupied(-1, -1) + Acc.seenOccupied(0, -1) + Acc.seenOccupied(1, -1) + Acc.seenOccupied(-1, 0) + Acc.seenOccupied(1, 0) + Acc.seenOccupied(-1, 1) + Acc.seenOccupied(0, 1) + Acc.seenOccupied(1, 1);
+        const int occupiedNeighbour = prev.seenOccupied(-1, -1) + prev.seenOccupied(0, -1) + prev.seenOccupied(1, -1) + prev.seenOccupied(-1, 0) + prev.seenOccupied(1, 0) + prev.seenOccupied(-1, 1) + prev.seenOccupied(0, 1) + prev.seenOccupied(1, 1);
 
-        if (Acc(0, 0) == 0 && occupiedNeighbour == 0) {
+        if (prev(0, 0) == 0 && occupiedNeighbour == 0) {
           // if not occupied seat
-          nextGrid[Acc.refY][Acc.refX] = 1;
+          nextGrid[prev.refY][prev.refX] = 1;
           haveChanged = true;
           continue;
         }
 
-        if (Acc(0, 0) == 1 && occupiedNeighbour > 4) {
+        if (prev(0, 0) == 1 && occupiedNeighbour > 4) {
           // if occupied seat
-          nextGrid[Acc.refY][Acc.refX] = 0;
+          nextGrid[prev.refY][prev.refX] = 0;
           haveChanged = true;
           continue;
         }
