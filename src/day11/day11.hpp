@@ -20,14 +20,14 @@ public:
     return refX + x >= 0 & refY + y >= 0 & refX + x < width & refY + y < height;
   }
 
-  const int& operator()(int64_t x, int64_t y) const {
+  const int &operator()(int64_t x, int64_t y) const {
     if (!isInside(x, y)) {
       return padding;
     }
     return grid[refY + y][refX + x];
   }
 
-  int& operator()(int64_t x, int64_t y) {
+  int &operator()(int64_t x, int64_t y) {
     return grid[refY + y][refX + x];
   }
 
@@ -41,7 +41,7 @@ public:
 
   int occupiedInSight(int64_t dirx, int64_t diry) const {
     for (int64_t x = dirx, y = diry; isInside(x, y); x += dirx, y += diry) {
-      if (this->operator()(x, y) != -1) {
+      if (grid[refY + y][refX + x] != -1) {
         return this->operator()(x, y);
       }
     }
@@ -81,7 +81,7 @@ size_t part1(const std::vector<std::vector<int>> &grid) {
           // if not occupied seat
           nextGrid[prev.refY][prev.refX] = 1;
           haveChanged = true;
-        } else  if (prev(0, 0) == 1 && occupiedNeighbour > 3) {
+        } else if (prev(0, 0) == 1 && occupiedNeighbour > 3) {
           // if occupied seat
           nextGrid[prev.refY][prev.refX] = 0;
           haveChanged = true;
@@ -102,7 +102,6 @@ size_t part1(const std::vector<std::vector<int>> &grid) {
     // }
     // std::cout << std::endl;
     previousGrid = nextGrid;
-
   }
 
   size_t count = 0;
