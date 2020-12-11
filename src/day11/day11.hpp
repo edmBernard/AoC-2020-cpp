@@ -17,7 +17,7 @@ public:
   }
 
   bool isInside(int64_t x, int64_t y) const {
-    return refX + x >= 0 && refY + y >= 0 && refX + x < width && refY + y < height;
+    return refX + x >= 0 & refY + y >= 0 & refX + x < width & refY + y < height;
   }
 
   const int& operator()(int64_t x, int64_t y) const {
@@ -67,8 +67,8 @@ size_t part1(const std::vector<std::vector<int>> &grid) {
   while (haveChanged) {
     haveChanged = false;
 
-    for (prev.refY = 0; prev.refY < prev.height; prev.refY++) {
-      for (prev.refX = 0; prev.refX < prev.width; prev.refX++) {
+    for (prev.refY = 0; prev.refY < prev.height; ++prev.refY) {
+      for (prev.refX = 0; prev.refX < prev.width; ++prev.refX) {
 
         if (prev(0, 0) < 0) {
           // if no seat
@@ -81,12 +81,10 @@ size_t part1(const std::vector<std::vector<int>> &grid) {
           // if not occupied seat
           nextGrid[prev.refY][prev.refX] = 1;
           haveChanged = true;
-          continue;
         } else  if (prev(0, 0) == 1 && occupiedNeighbour > 3) {
           // if occupied seat
           nextGrid[prev.refY][prev.refX] = 0;
           haveChanged = true;
-          continue;
         }
       }
     }
