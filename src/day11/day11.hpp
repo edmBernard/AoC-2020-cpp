@@ -36,7 +36,7 @@ public:
       return 0;
     }
     const int occupied = grid[refY + y][refX + x];
-    return occupied > 0 ? occupied : 0;
+    return occupied == 1 ? occupied : 0;
   }
 
   int occupiedInSight(int64_t dirx, int64_t diry) const {
@@ -70,7 +70,7 @@ size_t part1(const std::vector<std::vector<int>> &grid) {
     for (prev.refY = 0; prev.refY < prev.height; ++prev.refY) {
       for (prev.refX = 0; prev.refX < prev.width; ++prev.refX) {
 
-        if (prev(0, 0) < 0) {
+        if (prev(0, 0) == -1) {
           // if no seat
           continue;
         }
@@ -125,7 +125,7 @@ size_t part2(const std::vector<std::vector<int>> &grid) {
     for (prev.refY = 0; prev.refY < prev.height; ++prev.refY) {
       for (prev.refX = 0; prev.refX < prev.width; ++prev.refX) {
 
-        if (prev(0, 0) < 0) {
+        if (prev(0, 0) == -1) {
           // if no seat
           continue;
         }
