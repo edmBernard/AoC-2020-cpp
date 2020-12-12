@@ -28,3 +28,25 @@ cmake --build . --config Release
 ```bash
 cmake --build . --config Release --target test
 ```
+
+## Run Benchmark
+
+```bash
+cmake --build . --config Release --target benchmark
+```
+
+```
+Day1     : 0.71 ms
+Day2     : 0.58 ms
+Day3     : 0.05 ms
+Day4     : 1.45 ms
+Day5     : 0.05 ms
+Day6     : 0.09 ms
+Day7     : 5.60 ms
+Day8     : 2.16 ms
+Day9     : 0.28 ms
+Day10    : 0.01 ms
+Day11    : 7.60 ms
+Day12    : 0.05 ms
+Total duration per run : 18.65 ms
+```

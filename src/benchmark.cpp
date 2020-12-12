@@ -28,7 +28,7 @@
       time_day##x += elapsed_temp.count();                                                                             \
     }                                                                                                                  \
     totalCount += time_day##x;                                                                                         \
-    fmt::print("Day{} Splitted: {:.2f} ms \n", x, time_day##x / repetition);                                           \
+    fmt::print("Day{: <5} : {:.2f} ms \n", x, time_day##x / repetition);                                           \
   }
 
 #define BENCH(x)                                                                                                       \
