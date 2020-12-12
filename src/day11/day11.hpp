@@ -10,6 +10,20 @@
 
 namespace day11 {
 
+void showGrid(const std::vector<std::vector<int>> &grid) {
+  for (auto row : grid) {
+    for (auto elem : row) {
+      if (elem >= 0) {
+        std::cout << elem << " ";
+      } else {
+        std::cout << "  ";
+      }
+    }
+    std::cout << std::endl;
+  }
+  std::cout << std::endl;
+}
+
 class GridAccessor {
 public:
   GridAccessor(std::vector<std::vector<int>> &grid)
@@ -20,14 +34,21 @@ public:
     return refX + x >= 0 & refY + y >= 0 & refX + x < width & refY + y < height;
   }
 
+  //! Access operator without boundary check
   const int &operator()(int64_t x, int64_t y) const {
-    if (!isInside(x, y)) {
-      return padding;
-    }
     return grid[refY + y][refX + x];
   }
 
+  //! Access operator without boundary check
   int &operator()(int64_t x, int64_t y) {
+    return grid[refY + y][refX + x];
+  }
+
+  //! Access operator with boundary check
+  const int &at(int64_t x, int64_t y) const {
+    if (!isInside(x, y)) {
+      return padding;
+    }
     return grid[refY + y][refX + x];
   }
 
@@ -37,6 +58,10 @@ public:
     }
     const int occupied = grid[refY + y][refX + x];
     return occupied == 1 ? occupied : 0;
+  }
+
+  int occupiedWithoutCheck(int64_t x, int64_t y) const {
+    return grid[refY + y][refX + x] == 1 ? grid[refY + y][refX + x] : 0;
   }
 
   int occupiedInSight(int64_t dirx, int64_t diry) const {
@@ -75,7 +100,7 @@ size_t part1(const std::vector<std::vector<int>> &grid) {
           continue;
         }
 
-        const int occupiedNeighbour = prev.occupied(-1, -1) + prev.occupied(0, -1) + prev.occupied(1, -1) + prev.occupied(-1, 0) + prev.occupied(1, 0) + prev.occupied(-1, 1) + prev.occupied(0, 1) + prev.occupied(1, 1);
+        const int occupiedNeighbour = prev.occupiedWithoutCheck(-1, -1) + prev.occupiedWithoutCheck(0, -1) + prev.occupiedWithoutCheck(1, -1) + prev.occupiedWithoutCheck(-1, 0) + prev.occupiedWithoutCheck(1, 0) + prev.occupiedWithoutCheck(-1, 1) + prev.occupiedWithoutCheck(0, 1) + prev.occupiedWithoutCheck(1, 1);
 
         if (prev(0, 0) == 0 && occupiedNeighbour == 0) {
           // if not occupied seat
@@ -89,18 +114,6 @@ size_t part1(const std::vector<std::vector<int>> &grid) {
       }
     }
 
-    // std::cout << "grid " << std::endl;
-    // for (auto row : nextGrid) {
-    //   for (auto elem : row) {
-    //     if (elem >= 0) {
-    //       std::cout << elem << " ";
-    //     } else {
-    //       std::cout << "  ";
-    //     }
-    //   }
-    //   std::cout << std::endl;
-    // }
-    // std::cout << std::endl;
     previousGrid = nextGrid;
   }
 
@@ -144,18 +157,6 @@ size_t part2(const std::vector<std::vector<int>> &grid) {
       }
     }
 
-    // std::cout << "grid " << std::endl;
-    // for (auto row : nextGrid) {
-    //   for (auto elem : row) {
-    //     if (elem >= 0) {
-    //       std::cout << elem << " ";
-    //     } else {
-    //       std::cout << "  ";
-    //     }
-    //   }
-    //   std::cout << std::endl;
-    // }
-    // std::cout << std::endl;
     previousGrid = nextGrid;
   }
 
@@ -177,7 +178,8 @@ std::vector<std::vector<int>> parseInputFile(std::string filename) {
   std::vector<std::vector<int>> grid;
   std::string line;
   while (infile >> line) {
-    std::vector<int> row;
+    // Add padding of flour to remove lots of boundary check in part1
+    std::vector<int> row{-1};
     for (char i : line) {
       if (i == '.') {
         row.push_back(-1);
@@ -187,8 +189,11 @@ std::vector<std::vector<int>> parseInputFile(std::string filename) {
         row.push_back(1);
       }
     }
+    row.push_back(-1);
     grid.push_back(row);
   }
+  grid.push_back(std::vector<int>(grid[0].size(), -1));
+  grid.insert(grid.begin(), std::vector<int>(grid[0].size(), -1));
   return grid;
 }
 
