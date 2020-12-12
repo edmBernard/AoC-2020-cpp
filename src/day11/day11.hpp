@@ -10,13 +10,14 @@
 
 namespace day11 {
 
-void showGrid(const std::vector<std::vector<int>> &grid) {
-  for (auto row : grid) {
-    for (auto elem : row) {
-      if (elem >= 0) {
-        std::cout << elem << " ";
+void showGrid(const std::vector<int> &grid, int width, int height) {
+  std::cout << std::endl;
+  for (int y = 0; y < height; ++y) {
+    for (int x = 0; x < width; ++x) {
+      if (grid[y * width + x] >= 0) {
+        std::cout << grid[y * width + x] << " ";
       } else {
-        std::cout << "  ";
+        std::cout << ". ";
       }
     }
     std::cout << std::endl;
@@ -24,148 +25,182 @@ void showGrid(const std::vector<std::vector<int>> &grid) {
   std::cout << std::endl;
 }
 
-class GridAccessor {
-public:
-  GridAccessor(std::vector<int> &grid, int width, int height)
-      : grid(grid), height(height), width(width) {
-  }
 
-  inline bool isInside(int64_t x, int64_t y) const {
-    return refX + x >= 0 & refY + y >= 0 & refX + x < width & refY + y < height;
-  }
 
-  //! Access operator without boundary check
-  const int &operator()(int64_t x, int64_t y) const {
-    return grid[(refY + y) * width + refX + x];
-  }
-
-  //! Access operator without boundary check
-  int &operator()(int64_t x, int64_t y) {
-    return grid[(refY + y) * width + refX + x];
-  }
-
-  //! Access operator with boundary check
-  const int &at(int64_t x, int64_t y) const {
-    if (!isInside(x, y)) {
-      return padding;
-    }
-    return grid[(refY + y) * width + refX + x];
-  }
-
-  int occupied(int64_t x, int64_t y) const {
-    if (!isInside(x, y)) {
-      return 0;
-    }
-    return grid[(refY + y) * width + refX + x] == 1 ? grid[(refY + y) * width + refX + x] : 0;
-  }
-
-  int occupiedWithoutCheck(int64_t x, int64_t y) const {
-    return grid[(refY + y) * width + refX + x] == 1 ? grid[(refY + y) * width + refX + x] : 0;
-  }
-
-  int occupiedInSight(int64_t dirx, int64_t diry) const {
-    for (int64_t x = dirx, y = diry; isInside(x, y); x += dirx, y += diry) {
-      if (grid[(refY + y) * width + refX + x] != -1) {
-        return grid[(refY + y) * width + refX + x];
-      }
-    }
-    return 0;
-  }
-
-  int64_t refX = 0;
-  int64_t refY = 0;
-  const size_t height;
-  const size_t width;
-
-private:
-  const int padding = 0;
-  std::vector<int> &grid;
-};
 
 size_t part1(const std::tuple<int, int, std::vector<int>> &board) {
-  const auto& [width, height, grid] = board;
+  const auto &[width, height, grid] = board;
 
-  std::vector<int> previousGrid(grid.begin(), grid.end());
-  std::vector<int> nextGrid(previousGrid.begin(), previousGrid.end());
-  GridAccessor prev(previousGrid, width, height);
-  GridAccessor next(nextGrid, width, height);
+  std::vector<int> mutgrid(grid.begin(), grid.end());
 
+  std::vector<size_t> seats;
+  std::vector<std::vector<size_t>> neighbours;
+  seats.reserve(mutgrid.size());
+  int rowOffset = width;
+  int columnOffset = 1;
+
+  for (size_t i = 0; i < mutgrid.size(); ++i) {
+    if (mutgrid[i] == -1) {
+      continue;
+    }
+
+    seats.push_back(i);
+
+    std::vector<size_t> temp;
+    temp.reserve(8);
+
+    // vertical
+    if (mutgrid[i + rowOffset] == 0) {
+      temp.push_back(i + rowOffset);
+    }
+    if (mutgrid[i - rowOffset] == 0) {
+      temp.push_back(i - rowOffset);
+    }
+    // horizontal
+    if (mutgrid[i - columnOffset] == 0) {
+      temp.push_back(i - columnOffset);
+    }
+    if (mutgrid[i + columnOffset] == 0) {
+      temp.push_back(i + columnOffset);
+    }
+    // diagonal
+    if (mutgrid[i + rowOffset + columnOffset] == 0) {
+      temp.push_back(i + rowOffset + columnOffset);
+    }
+    if (mutgrid[i + rowOffset - columnOffset] == 0) {
+      temp.push_back(i + rowOffset - columnOffset);
+    }
+
+    if (mutgrid[i - rowOffset + columnOffset] == 0) {
+      temp.push_back(i - rowOffset + columnOffset);
+    }
+    if (mutgrid[i - rowOffset - columnOffset] == 0) {
+      temp.push_back(i - rowOffset - columnOffset);
+    }
+
+    neighbours.push_back(temp);
+  }
+
+  std::vector<size_t> toChange;
   bool haveChanged = true;
   while (haveChanged) {
     haveChanged = false;
 
-    for (prev.refY = 0; prev.refY < prev.height; ++prev.refY) {
-      for (prev.refX = 0; prev.refX < prev.width; ++prev.refX) {
+    for (size_t i = 0; i < seats.size(); ++i) {
+      const size_t idx = seats[i];
+      int occupiedNeighbour = 0;
+      for (const auto & nidx : neighbours[i]) {
+        occupiedNeighbour += (mutgrid[nidx] == 1);
+      }
 
-        if (prev(0, 0) == -1) {
-          // if no seat
-          continue;
-        }
-
-        const int occupiedNeighbour = prev.occupied(-1, -1) + prev.occupied(0, -1) + prev.occupied(1, -1) + prev.occupied(-1, 0) + prev.occupied(1, 0) + prev.occupied(-1, 1) + prev.occupied(0, 1) + prev.occupied(1, 1);
-
-        if (prev(0, 0) == 0 && occupiedNeighbour == 0) {
-          // if not occupied seat
-          next(prev.refX, prev.refY) = 1;
-          haveChanged = true;
-        } else if (prev(0, 0) == 1 && occupiedNeighbour > 3) {
-          // if occupied seat
-          next(prev.refX, prev.refY) = 0;
-          haveChanged = true;
-        }
+      if ((mutgrid[idx] == 0 && occupiedNeighbour == 0) || (mutgrid[idx] == 1 && occupiedNeighbour > 3)) {
+        toChange.push_back(idx);
       }
     }
 
-    previousGrid = nextGrid;
+    for (const auto &idx : toChange) {
+      // inverse state of seat in to change
+      mutgrid[idx] = (mutgrid[idx] + 1) & 1;
+      haveChanged = true;
+    }
+    toChange.clear();
   }
 
   size_t count = 0;
-  for (auto elem : previousGrid) {
-    count += elem == 1 ? 1 : 0;
+  for (const auto &idx : seats) {
+    count += mutgrid[idx] == 1 ? 1 : 0;
   }
   return count;
 }
 
+size_t seatInSight(size_t idx, int64_t dirx, int64_t diry, const std::vector<int>& grid, int width, int height) {
+  int refx = idx % width;
+  int refy = idx / width;
+  auto isInside = [=](int x, int y) {return refx + x >= 0 & refy + y >= 0 & refx + x < width & refy + y < height; };
+  for (int64_t x = dirx, y = diry; isInside(x, y); x += dirx, y += diry) {
+    if (grid[(refy + y) * width + refx + x] != -1) {
+      return (refy + y) * width + refx + x;
+    }
+  }
+  return 0;
+}
+
 size_t part2(const std::tuple<int, int, std::vector<int>> &board) {
-  const auto& [width, height, grid] = board;
+  const auto &[width, height, grid] = board;
 
-  std::vector<int> previousGrid(grid.begin(), grid.end());
-  std::vector<int> nextGrid(previousGrid.begin(), previousGrid.end());
-  GridAccessor prev(previousGrid, width, height);
-  GridAccessor next(nextGrid, width, height);
+  std::vector<int> mutgrid(grid.begin(), grid.end());
 
+  std::vector<size_t> seats;
+  seats.reserve(mutgrid.size());
+
+  std::vector<std::vector<size_t>> neighbours;
+
+  for (size_t i = 0; i < mutgrid.size(); ++i) {
+    if (mutgrid[i] == -1) {
+      continue;
+    }
+
+    seats.push_back(i);
+
+    std::vector<size_t> temp;
+    temp.reserve(8);
+
+    if (auto idx = seatInSight(i, 1, 0, grid, width, height); idx != 0) {
+      temp.push_back(idx);
+    }
+    if (auto idx = seatInSight(i, 1, 1, grid, width, height); idx != 0) {
+      temp.push_back(idx);
+    }
+    if (auto idx = seatInSight(i, 0, 1, grid, width, height); idx != 0) {
+      temp.push_back(idx);
+    }
+    if (auto idx = seatInSight(i, -1, 1, grid, width, height); idx != 0) {
+      temp.push_back(idx);
+    }
+    if (auto idx = seatInSight(i, -1, 0, grid, width, height); idx != 0) {
+      temp.push_back(idx);
+    }
+    if (auto idx = seatInSight(i, -1, -1, grid, width, height); idx != 0) {
+      temp.push_back(idx);
+    }
+    if (auto idx = seatInSight(i, 0, -1, grid, width, height); idx != 0) {
+      temp.push_back(idx);
+    }
+    if (auto idx = seatInSight(i, 1, -1, grid, width, height); idx != 0) {
+      temp.push_back(idx);
+    }
+
+    neighbours.push_back(temp);
+  }
+
+  std::vector<size_t> toChange;
   bool haveChanged = true;
   while (haveChanged) {
     haveChanged = false;
 
-    for (prev.refY = 0; prev.refY < prev.height; ++prev.refY) {
-      for (prev.refX = 0; prev.refX < prev.width; ++prev.refX) {
+    for (size_t i = 0; i < seats.size(); ++i) {
+      const size_t idx = seats[i];
+      int occupiedNeighbour = 0;
+      for (const auto & nidx : neighbours[i]) {
+        occupiedNeighbour += (mutgrid[nidx] == 1);
+      }
 
-        if (prev(0, 0) == -1) {
-          // if no seat
-          continue;
-        }
-
-        const int occupiedNeighbour = prev.occupiedInSight(-1, -1) + prev.occupiedInSight(0, -1) + prev.occupiedInSight(1, -1) + prev.occupiedInSight(-1, 0) + prev.occupiedInSight(1, 0) + prev.occupiedInSight(-1, 1) + prev.occupiedInSight(0, 1) + prev.occupiedInSight(1, 1);
-
-        if (prev(0, 0) == 0 && occupiedNeighbour == 0) {
-          // if not occupied seat
-          next(prev.refX, prev.refY) = 1;
-          haveChanged = true;
-        } else if (prev(0, 0) == 1 && occupiedNeighbour > 4) {
-          // if occupied seat
-          next(prev.refX, prev.refY) = 0;
-          haveChanged = true;
-        }
+      if ((mutgrid[idx] == 0 && occupiedNeighbour == 0) || (mutgrid[idx] == 1 && occupiedNeighbour > 4)) {
+        toChange.push_back(idx);
       }
     }
 
-    previousGrid = nextGrid;
+    for (const auto &idx : toChange) {
+      // inverse state of seat in to change
+      mutgrid[idx] = (mutgrid[idx] + 1) & 1;
+      haveChanged = true;
+    }
+    toChange.clear();
   }
 
   size_t count = 0;
-  for (auto elem : previousGrid) {
-    count += elem == 1 ? 1 : 0;
+  for (const auto &idx : seats) {
+    count += mutgrid[idx] == 1 ? 1 : 0;
   }
   return count;
 }
@@ -182,6 +217,7 @@ std::tuple<int, int, std::vector<int>> parseInputFile(std::string filename) {
   std::string line;
   while (infile >> line) {
 
+    grid.push_back(-1); // add padding to remove boundary check
     for (char i : line) {
       if (i == '.') {
         grid.push_back(-1);
@@ -191,11 +227,16 @@ std::tuple<int, int, std::vector<int>> parseInputFile(std::string filename) {
         grid.push_back(1);
       }
     }
-    if (width == 0) {
-      width = grid.size();
-    }
+    grid.push_back(-1);
   }
-  height = grid.size() / width;
+  width = line.size() + 2;
+  height = grid.size() / width + 2;
+
+  std::vector<int> fullFloorLine(width, -1);
+  // add padding, one line before and one line after
+  grid.insert(grid.begin(), fullFloorLine.begin(), fullFloorLine.end());
+  grid.insert(grid.end(), fullFloorLine.begin(), fullFloorLine.end());
+
   return {width, height, grid};
 }
 
