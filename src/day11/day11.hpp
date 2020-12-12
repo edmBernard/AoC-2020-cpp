@@ -26,9 +26,7 @@ void showGrid(const std::vector<int> &grid, int width, int height) {
 }
 
 
-
-
-size_t part1(const std::tuple<int, int, std::vector<int>> &board) {
+size_t processLoop(const std::tuple<int, int, std::vector<int>> &board, auto getNeighbour, int maxNeighbour) {
   const auto &[width, height, grid] = board;
 
   std::vector<int> mutgrid(grid.begin(), grid.end());
@@ -49,33 +47,29 @@ size_t part1(const std::tuple<int, int, std::vector<int>> &board) {
     std::vector<size_t> temp;
     temp.reserve(8);
 
-    // vertical
-    if (mutgrid[i + rowOffset] == 0) {
-      temp.push_back(i + rowOffset);
+    if (auto idx = getNeighbour(i, 1, 0, grid, width, height); idx != 0) {
+      temp.push_back(idx);
     }
-    if (mutgrid[i - rowOffset] == 0) {
-      temp.push_back(i - rowOffset);
+    if (auto idx = getNeighbour(i, 1, 1, grid, width, height); idx != 0) {
+      temp.push_back(idx);
     }
-    // horizontal
-    if (mutgrid[i - columnOffset] == 0) {
-      temp.push_back(i - columnOffset);
+    if (auto idx = getNeighbour(i, 0, 1, grid, width, height); idx != 0) {
+      temp.push_back(idx);
     }
-    if (mutgrid[i + columnOffset] == 0) {
-      temp.push_back(i + columnOffset);
+    if (auto idx = getNeighbour(i, -1, 1, grid, width, height); idx != 0) {
+      temp.push_back(idx);
     }
-    // diagonal
-    if (mutgrid[i + rowOffset + columnOffset] == 0) {
-      temp.push_back(i + rowOffset + columnOffset);
+    if (auto idx = getNeighbour(i, -1, 0, grid, width, height); idx != 0) {
+      temp.push_back(idx);
     }
-    if (mutgrid[i + rowOffset - columnOffset] == 0) {
-      temp.push_back(i + rowOffset - columnOffset);
+    if (auto idx = getNeighbour(i, -1, -1, grid, width, height); idx != 0) {
+      temp.push_back(idx);
     }
-
-    if (mutgrid[i - rowOffset + columnOffset] == 0) {
-      temp.push_back(i - rowOffset + columnOffset);
+    if (auto idx = getNeighbour(i, 0, -1, grid, width, height); idx != 0) {
+      temp.push_back(idx);
     }
-    if (mutgrid[i - rowOffset - columnOffset] == 0) {
-      temp.push_back(i - rowOffset - columnOffset);
+    if (auto idx = getNeighbour(i, 1, -1, grid, width, height); idx != 0) {
+      temp.push_back(idx);
     }
 
     neighbours.push_back(temp);
@@ -93,7 +87,7 @@ size_t part1(const std::tuple<int, int, std::vector<int>> &board) {
         occupiedNeighbour += (mutgrid[nidx] == 1);
       }
 
-      if ((mutgrid[idx] == 0 && occupiedNeighbour == 0) || (mutgrid[idx] == 1 && occupiedNeighbour > 3)) {
+      if ((mutgrid[idx] == 0 && occupiedNeighbour == 0) || (mutgrid[idx] == 1 && occupiedNeighbour > maxNeighbour)) {
         toChange.push_back(idx);
       }
     }
@@ -111,6 +105,19 @@ size_t part1(const std::tuple<int, int, std::vector<int>> &board) {
     count += mutgrid[idx] == 1 ? 1 : 0;
   }
   return count;
+}
+
+size_t seatNear(size_t idx, int64_t offsetx, int64_t offsety, const std::vector<int>& grid, int width, int height) {
+  // we don't need to check border because we add padding around the grid
+  if (grid[idx + offsetx + offsety * width] == 0) {
+    return idx + offsetx + offsety * width;
+  }
+  return 0;
+}
+
+
+size_t part1(const std::tuple<int, int, std::vector<int>> &board) {
+  return processLoop(board, seatNear, 3);
 }
 
 size_t seatInSight(size_t idx, int64_t dirx, int64_t diry, const std::vector<int>& grid, int width, int height) {
@@ -126,83 +133,7 @@ size_t seatInSight(size_t idx, int64_t dirx, int64_t diry, const std::vector<int
 }
 
 size_t part2(const std::tuple<int, int, std::vector<int>> &board) {
-  const auto &[width, height, grid] = board;
-
-  std::vector<int> mutgrid(grid.begin(), grid.end());
-
-  std::vector<size_t> seats;
-  seats.reserve(mutgrid.size());
-
-  std::vector<std::vector<size_t>> neighbours;
-
-  for (size_t i = 0; i < mutgrid.size(); ++i) {
-    if (mutgrid[i] == -1) {
-      continue;
-    }
-
-    seats.push_back(i);
-
-    std::vector<size_t> temp;
-    temp.reserve(8);
-
-    if (auto idx = seatInSight(i, 1, 0, grid, width, height); idx != 0) {
-      temp.push_back(idx);
-    }
-    if (auto idx = seatInSight(i, 1, 1, grid, width, height); idx != 0) {
-      temp.push_back(idx);
-    }
-    if (auto idx = seatInSight(i, 0, 1, grid, width, height); idx != 0) {
-      temp.push_back(idx);
-    }
-    if (auto idx = seatInSight(i, -1, 1, grid, width, height); idx != 0) {
-      temp.push_back(idx);
-    }
-    if (auto idx = seatInSight(i, -1, 0, grid, width, height); idx != 0) {
-      temp.push_back(idx);
-    }
-    if (auto idx = seatInSight(i, -1, -1, grid, width, height); idx != 0) {
-      temp.push_back(idx);
-    }
-    if (auto idx = seatInSight(i, 0, -1, grid, width, height); idx != 0) {
-      temp.push_back(idx);
-    }
-    if (auto idx = seatInSight(i, 1, -1, grid, width, height); idx != 0) {
-      temp.push_back(idx);
-    }
-
-    neighbours.push_back(temp);
-  }
-
-  std::vector<size_t> toChange;
-  bool haveChanged = true;
-  while (haveChanged) {
-    haveChanged = false;
-
-    for (size_t i = 0; i < seats.size(); ++i) {
-      const size_t idx = seats[i];
-      int occupiedNeighbour = 0;
-      for (const auto & nidx : neighbours[i]) {
-        occupiedNeighbour += (mutgrid[nidx] == 1);
-      }
-
-      if ((mutgrid[idx] == 0 && occupiedNeighbour == 0) || (mutgrid[idx] == 1 && occupiedNeighbour > 4)) {
-        toChange.push_back(idx);
-      }
-    }
-
-    for (const auto &idx : toChange) {
-      // inverse state of seat in to change
-      mutgrid[idx] = (mutgrid[idx] + 1) & 1;
-      haveChanged = true;
-    }
-    toChange.clear();
-  }
-
-  size_t count = 0;
-  for (const auto &idx : seats) {
-    count += mutgrid[idx] == 1 ? 1 : 0;
-  }
-  return count;
+  return processLoop(board, seatInSight, 4);
 }
 
 std::tuple<int, int, std::vector<int>> parseInputFile(std::string filename) {
