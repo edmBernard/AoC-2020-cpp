@@ -88,6 +88,7 @@ size_t part1(const std::tuple<int, int, std::vector<int>> &board) {
   std::vector<int> previousGrid(grid.begin(), grid.end());
   std::vector<int> nextGrid(previousGrid.begin(), previousGrid.end());
   GridAccessor prev(previousGrid, width, height);
+  GridAccessor next(nextGrid, width, height);
 
   bool haveChanged = true;
   while (haveChanged) {
@@ -105,11 +106,11 @@ size_t part1(const std::tuple<int, int, std::vector<int>> &board) {
 
         if (prev(0, 0) == 0 && occupiedNeighbour == 0) {
           // if not occupied seat
-          nextGrid[(prev.refY) * width + prev.refX] = 1;
+          next(prev.refX, prev.refY) = 1;
           haveChanged = true;
         } else if (prev(0, 0) == 1 && occupiedNeighbour > 3) {
           // if occupied seat
-          nextGrid[(prev.refY) * width + prev.refX] = 0;
+          next(prev.refX, prev.refY) = 0;
           haveChanged = true;
         }
       }
@@ -131,6 +132,7 @@ size_t part2(const std::tuple<int, int, std::vector<int>> &board) {
   std::vector<int> previousGrid(grid.begin(), grid.end());
   std::vector<int> nextGrid(previousGrid.begin(), previousGrid.end());
   GridAccessor prev(previousGrid, width, height);
+  GridAccessor next(nextGrid, width, height);
 
   bool haveChanged = true;
   while (haveChanged) {
@@ -148,11 +150,11 @@ size_t part2(const std::tuple<int, int, std::vector<int>> &board) {
 
         if (prev(0, 0) == 0 && occupiedNeighbour == 0) {
           // if not occupied seat
-          nextGrid[(prev.refY) * width + prev.refX] = 1;
+          next(prev.refX, prev.refY) = 1;
           haveChanged = true;
         } else if (prev(0, 0) == 1 && occupiedNeighbour > 4) {
           // if occupied seat
-          nextGrid[(prev.refY) * width + prev.refX] = 0;
+          next(prev.refX, prev.refY) = 0;
           haveChanged = true;
         }
       }
