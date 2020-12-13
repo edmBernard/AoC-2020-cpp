@@ -32,42 +32,41 @@ size_t part1(const std::tuple<int, std::vector<int>> &inputs) {
   return (nextBusTimestamp - timestamp) * nextBusID;
 }
 
-size_t part2(const std::tuple<int, std::vector<int>> &inputs) {
-  const auto& [timestamp, busIDs] = inputs;
+int64_t findEi(const std::vector<int>& busIDs, size_t idx) {
+  int64_t ni = 1;
+  for (auto i : busIDs) {
+    if (i != busIDs[idx]) {
+      ni *= i;
+    }
+  }
+  int64_t ei = ni;
+  while (ei % busIDs[idx] != 1) {
+    ei += ni;
+  }
+  return ei;
+}
 
-  auto max = std::max_element(busIDs.begin(), busIDs.end());
-  int64_t timestampTarget = - (max - busIDs.begin());
-  std::cout << "std::numeric_limits<int64_t>::max(): " << std::numeric_limits<int64_t>::max() << std::endl;
+
+size_t part2(const std::tuple<int, std::vector<int>> &inputs) {
+  // Chinese remainder theorem. cf. wikipedia
+  const auto& [timestamp, busIDs] = inputs;
 
   std::vector<int> prunedBusIDs;
   std::vector<int> prunedOffset;
+  int64_t n = 1;
   for (size_t idx = 0; idx < busIDs.size(); ++idx) {
     if (busIDs[idx] != -1) {
       prunedBusIDs.push_back(busIDs[idx]);
       prunedOffset.push_back(idx);
+      n *= busIDs[idx];
     }
   }
 
-
-  bool notValid = true;
-  while (notValid) {
-    notValid = false;
-    timestampTarget += *max;
-    for (size_t i = 0; i < prunedOffset.size(); ++i) {
-      const int id = prunedBusIDs[i];
-      const int offset = prunedOffset[i];
-      if ((timestampTarget+offset)%id != 0) {
-        notValid = true;
-      }
-    }
-    if (timestampTarget % 10000 == 0) {
-      std::cout << "timestampTarget: " << timestampTarget << std::endl;
-    }
-    if (timestampTarget > std::numeric_limits<int64_t>::max() - 2 * (*max)) {
-      break;
-    }
+  int64_t x = 0;
+  for (size_t i = 0; i < prunedBusIDs.size(); ++i) {
+    x += findEi(prunedBusIDs, i) * ((prunedBusIDs[i] - prunedOffset[i]) % prunedBusIDs[i]);
   }
-  return timestampTarget;
+  return x % n;
 }
 
 std::tuple<int, std::vector<int>> parseInputFile(std::string filename) {
@@ -85,6 +84,7 @@ std::tuple<int, std::vector<int>> parseInputFile(std::string filename) {
   if (ec != std::errc()) {
     throw ec;
   }
+  // second line
   infile >> line;
   std::stringstream ssLine(line);
   std::string id_s;
