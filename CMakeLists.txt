@@ -26,6 +26,7 @@ find_package(fmt CONFIG REQUIRED)
 include_directories(${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/test)
 
 #**************************************************************************************************
 # Set variable ************************************************************************************
@@ -65,20 +66,20 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/day12)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/day13)
 
 SET(TEST_SOURCES
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/catch2-main.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/day1-catch2.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/day2-catch2.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/day3-catch2.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/day4-catch2.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/day5-catch2.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/day6-catch2.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/day7-catch2.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/day8-catch2.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/day9-catch2.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/day10-catch2.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/day11-catch2.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/day12-catch2.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/day13-catch2.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/catch2-main.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/day1-catch2.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/day2-catch2.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/day3-catch2.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/day4-catch2.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/day5-catch2.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/day6-catch2.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/day7-catch2.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/day8-catch2.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/day9-catch2.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/day10-catch2.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/day11-catch2.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/day12-catch2.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/day13-catch2.cpp
 )
 
 add_executable(unit-test ${TEST_SOURCES} ${SOURCES})
