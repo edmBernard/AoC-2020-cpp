@@ -16,7 +16,7 @@
 
 namespace day14 {
 
-size_t part1(const std::tuple<std::map<uint64_t, uint64_t>, std::map<uint64_t, uint64_t>>& memory) {
+size_t part1(const std::tuple<std::unordered_map<uint64_t, uint64_t>, std::unordered_map<uint64_t, uint64_t>>& memory) {
   uint64_t count = 0;
   for (auto [k, v] : std::get<0>(memory)) {
     count += v;
@@ -25,7 +25,7 @@ size_t part1(const std::tuple<std::map<uint64_t, uint64_t>, std::map<uint64_t, u
 }
 
 
-size_t part2(const std::tuple<std::map<uint64_t, uint64_t>, std::map<uint64_t, uint64_t>>  &memory) {
+size_t part2(const std::tuple<std::unordered_map<uint64_t, uint64_t>, std::unordered_map<uint64_t, uint64_t>>  &memory) {
   uint64_t count = 0;
   for (auto [k, v] : std::get<1>(memory)) {
     count += v;
@@ -52,7 +52,7 @@ std::vector<uint64_t> buildFloatingMask(uint64_t wildcardMask) {
   return floatingMask;
 }
 
-std::tuple<std::map<uint64_t, uint64_t>, std::map<uint64_t, uint64_t>> parseInputFile(std::string filename) {
+std::tuple<std::unordered_map<uint64_t, uint64_t>, std::unordered_map<uint64_t, uint64_t>> parseInputFile(std::string filename) {
   std::ifstream infile(filename);
   if (!infile.is_open()) {
     throw std::runtime_error("File Not Found : " + filename);
@@ -66,8 +66,8 @@ std::tuple<std::map<uint64_t, uint64_t>, std::map<uint64_t, uint64_t>> parseInpu
   uint64_t maskNegative = 0; // Mask with X replaced by 1
   uint64_t wildcardMask = 0; // Mask with X positions
   std::vector<uint64_t> floatingMask; // all mask generated with wildcard replaced
-  std::map<uint64_t, uint64_t> memoryPart1;
-  std::map<uint64_t, uint64_t> memoryPart2;
+  std::unordered_map<uint64_t, uint64_t> memoryPart1;
+  std::unordered_map<uint64_t, uint64_t> memoryPart2;
 
   while (getline(infile, line)) {
 
