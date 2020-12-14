@@ -40,43 +40,36 @@ std::tuple<std::map<uint64_t, uint64_t>, std::map<uint64_t, uint64_t>> parseInpu
   }
 
   std::string line;
-
-  std::regex maskRegex("mask = ([0-1X]+)");
   std::regex memRegex("mem\\[([0-9]+)\\] = ([0-9]+)");
+  std::smatch match;
+
   uint64_t maskPositive = 0; // Mask with X replaced by 0
   uint64_t maskNegative = 0; // Mask with X replaced by 1
   uint64_t wildcardMask = 0; // Mask with X positions
-  std::smatch match;
+  std::vector<uint64_t> floatingMask; // all mask generated with wildcard replaced
   std::map<uint64_t, uint64_t> memoryPart1;
   std::map<uint64_t, uint64_t> memoryPart2;
-  std::vector<uint64_t> floatingMask; // all mask generated with wildcard replaced
 
   while (getline(infile, line)) {
-    if (std::regex_match(line, match, memRegex)) {
-      // Parsing of Line with Memory
-      memoryPart1[std::stoi(match[1])] = std::stoi(match[2]) & maskNegative | maskPositive;
 
-      for (uint64_t mask : floatingMask) {
-        const uint64_t memoryAddress = std::stoi(match[1]) & ~wildcardMask | mask | maskPositive;
-        memoryPart2[memoryAddress] = std::stoi(match[2]);
-      }
-    } else if (std::regex_match(line, match, maskRegex)) {
+    if (line[1] == 'a') {
+      // match the m"a"sk line
+      std::string_view mask_s(line.data() + 7, 36);
       // Parsing of Line with Mask
       maskPositive = 0;
       maskNegative = 0;
       wildcardMask = 0; // Mask with X position
       floatingMask.clear();
-      const std::string mask_s = match[1].str();
-      for (size_t i = 0; i < mask_s.size(); ++i) {
+      for (char c : mask_s) {
         maskNegative <<= 1;
         maskPositive <<= 1;
         wildcardMask <<= 1;
-        if (mask_s[i] == 'X') {
+        if (c == 'X') {
           maskNegative += 1;
           wildcardMask += 1;
         } else {
-          maskNegative += int(mask_s[i]=='1');
-          maskPositive += int(mask_s[i]=='1');
+          maskNegative += int(c=='1');
+          maskPositive += int(c=='1');
         }
       }
 
@@ -93,7 +86,16 @@ std::tuple<std::map<uint64_t, uint64_t>, std::map<uint64_t, uint64_t>> parseInpu
         }
         floatingMask.push_back(mask);
       }
+    } else if (std::regex_match(line, match, memRegex)) {
+      // Parsing of Line with Memory
+      memoryPart1[std::stoi(match[1])] = std::stoi(match[2]) & maskNegative | maskPositive;
+
+      for (uint64_t mask : floatingMask) {
+        const uint64_t memoryAddress = std::stoi(match[1]) & ~wildcardMask | mask | maskPositive;
+        memoryPart2[memoryAddress] = std::stoi(match[2]);
+      }
     }
+
   }
 
   return {memoryPart1, memoryPart2};
