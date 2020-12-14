@@ -43,22 +43,22 @@ std::tuple<std::map<uint64_t, uint64_t>, std::map<uint64_t, uint64_t>> parseInpu
 
   std::regex maskRegex("mask = ([0-1X]+)");
   std::regex memRegex("mem\\[([0-9]+)\\] = ([0-9]+)");
-  uint64_t maskPositive = 0;
-  uint64_t maskNegative = 0;
-  std::vector<uint64_t> memPosition;
-  std::vector<uint64_t> memValue;
+  uint64_t maskPositive = 0; // Mask with X replaced by 0
+  uint64_t maskNegative = 0; // Mask with X replaced by 1
+  uint64_t floatingMask = 0; // Mask that indicate X with 1
   std::smatch match;
   std::map<uint64_t, uint64_t> memoryPart1;
   std::map<uint64_t, uint64_t> memoryPart2;
-  uint64_t floatingMask;
   while (getline(infile, line)) {
     if (std::regex_match(line, match, memRegex)) {
       memoryPart1[std::stoi(match[1])] = std::stoi(match[2]) & maskNegative | maskPositive;
 
       // ugly solution with bit arithmetic
+      // Loop on number of X
       for (size_t i = 0; i < (1 << std::bitset<36>(floatingMask).count()); ++i) {
         int count = 0;
         uint64_t mask = 0;
+        // Loop on position in Mask
         for (size_t j = 0; j < 36; ++j) {
           if ((floatingMask >> j) & 1 ) {
             mask += (((i>>count) & 1) << j);
