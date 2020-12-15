@@ -33,25 +33,6 @@ size_t part2(const std::tuple<std::unordered_map<uint64_t, uint64_t>, std::unord
   return count;
 }
 
-
-std::vector<uint64_t> buildFloatingMask(uint64_t wildcardMask) {
-  std::vector<uint64_t> floatingMask; // all mask generated with wildcard replaced
-  // build floating mask
-  for (size_t i = 0; i < (1 << std::bitset<36>(wildcardMask).count()); ++i) {
-    int count = 0;
-    uint64_t mask = 0;
-    // Loop on position in Mask
-    for (size_t j = 0; j < 36; ++j) {
-      if ((wildcardMask >> j) & 1 ) {
-        mask += (((i>>count) & 1) << j);
-        ++count;
-      }
-    }
-    floatingMask.push_back(mask);
-  }
-  return floatingMask;
-}
-
 std::tuple<std::unordered_map<uint64_t, uint64_t>, std::unordered_map<uint64_t, uint64_t>> parseInputFile(std::string filename) {
   std::ifstream infile(filename);
   if (!infile.is_open()) {
@@ -78,7 +59,7 @@ std::tuple<std::unordered_map<uint64_t, uint64_t>, std::unordered_map<uint64_t, 
       maskPositive = 0;
       maskNegative = 0;
       wildcardMask = 0; // Mask with X position
-      // floatingMask.clear();
+      floatingMask.clear();
       for (char c : mask_s) {
         maskNegative <<= 1;
         maskPositive <<= 1;
@@ -92,12 +73,23 @@ std::tuple<std::unordered_map<uint64_t, uint64_t>, std::unordered_map<uint64_t, 
         }
       }
 
-      floatingMask = buildFloatingMask(wildcardMask);
-
+      // build floating mask
+      for (size_t i = 0; i < (1 << std::bitset<36>(wildcardMask).count()); ++i) {
+        int count = 0;
+        uint64_t mask = 0;
+        // Loop on position in Mask
+        for (size_t j = 0; j < 36; ++j) {
+          if ((wildcardMask >> j) & 1 ) {
+            mask += (((i>>count) & 1) << j);
+            ++count;
+          }
+        }
+        floatingMask.push_back(mask);
+      }
     } else if (std::regex_match(line, match, memRegex)) {
       // Parsing of Line with Memory
-      const uint16_t mem = std::stoi(match[1]);
-      const uint16_t value = std::stoi(match[2]);
+      const int mem = std::stoi(match[1]);
+      const int value = std::stoi(match[2]);
 
       memoryPart1[mem] = value & maskNegative | maskPositive;
 
@@ -108,6 +100,7 @@ std::tuple<std::unordered_map<uint64_t, uint64_t>, std::unordered_map<uint64_t, 
     }
 
   }
+
   return {memoryPart1, memoryPart2};
 }
 
