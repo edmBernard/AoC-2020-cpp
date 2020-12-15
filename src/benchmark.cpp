@@ -16,6 +16,7 @@
 #include "day12/day12.hpp"
 #include "day13/day13.hpp"
 #include "day14/day14.hpp"
+#include "day15/day15.hpp"
 
 // Temporary until I find a nicer solution without macro :(
 #define BENCH_SPLIT(x)                                                                                                 \
