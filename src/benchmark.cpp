@@ -65,6 +65,7 @@ int main() {
   BENCH_SPLIT(12);
   BENCH_SPLIT(13);
   BENCH_SPLIT(14);
+  BENCH_SPLIT(15);
 
   fmt::print("Total duration per run : {:.2f} ms \n\n", totalCount / repetition);
 
