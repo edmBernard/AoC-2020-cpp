@@ -41,7 +41,9 @@ size_t part1(const std::vector<int> &inputs) {
 
 uint64_t part2(const std::vector<int> &inputs) {
 
-  std::unordered_map<uint64_t, uint64_t> numbers;
+  // It possible to use an unordered map but it take 18x more time
+  std::vector<uint64_t> numbers(30000000, 0);
+
   uint64_t lastNumber;
   uint64_t previousPosition = 0;
   for (size_t i = 0; i < inputs.size(); ++i) {
@@ -57,11 +59,7 @@ uint64_t part2(const std::vector<int> &inputs) {
       currentNumber = 0;
     }
     lastNumber = currentNumber;
-    if (numbers.count(currentNumber)){
-      previousPosition = numbers[currentNumber];
-    } else {
-      previousPosition = 0;
-    }
+    previousPosition = numbers[currentNumber];
     numbers[currentNumber] = i;
   }
 
