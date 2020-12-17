@@ -43,7 +43,7 @@ uint64_t part2(const std::vector<int> &inputs) {
 
   // It possible to use an unordered map but it take 18x more time
   // a preallocated vector take more memory but is faster
-  std::vector<uint64_t> numbers(30000000, 0);
+  std::vector<uint64_t> numbers(30'000'000, 0);
 
   uint64_t lastNumber;
   uint64_t previousPosition = 0;
@@ -52,7 +52,7 @@ uint64_t part2(const std::vector<int> &inputs) {
     lastNumber = inputs[i];
   }
 
-  for (size_t i = inputs.size() + 1; i <= 30000000; ++i) {
+  for (size_t i = inputs.size() + 1; i <= 30'000'000; ++i) {
     uint64_t currentNumber;
     if (previousPosition != 0) {
       currentNumber = i - 1 - previousPosition;
