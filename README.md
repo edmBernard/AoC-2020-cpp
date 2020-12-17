@@ -36,22 +36,23 @@ cmake --build . --config Release --target benchmark
 ```
 
 ```
-Day1     : 0.77 ms
-Day2     : 0.57 ms
+Day1     : 0.71 ms
+Day2     : 0.58 ms
 Day3     : 0.05 ms
-Day4     : 1.45 ms
-Day5     : 0.06 ms
+Day4     : 1.44 ms
+Day5     : 0.05 ms
 Day6     : 0.09 ms
-Day7     : 5.62 ms
+Day7     : 5.61 ms
 Day8     : 2.14 ms
-Day9     : 0.29 ms
+Day9     : 0.28 ms
 Day10    : 0.01 ms
 Day11    : 7.63 ms
 Day12    : 0.06 ms
 Day13    : 0.01 ms
-Day14    : 14.95 ms
-Day16    : 0.71 ms
-Total duration per run : 34.41 ms
+Day14    : 14.67 ms
+Day16    : 0.88 ms
+Day17    : 89.32 ms
+Total duration per run : 123.55 ms
 
 Day15    : 552.23 ms // not take in account, too long
 ```

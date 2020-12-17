@@ -182,33 +182,37 @@ size_t part1(const std::tuple<std::vector<uint8_t>, int, int> &input) {
 
 
 size_t part2(const std::tuple<std::vector<uint8_t>, int, int> &input) {
-  // got luky it work on it I should use a set and only store active point but no motivation
- const auto &[grid, width, height] = input;
+  const auto &[grid, width, height] = input;
 
-  std::set<std::array<int64_t, 4>> previousGrid;
-  for (int64_t i = 0; i < grid.size(); ++i) {
+  std::map<std::array<int, 4>, int8_t> previousGrid;
+  for (int i = 0; i < grid.size(); ++i) {
     if (grid[i] == 1) {
-      previousGrid.insert({i % width, i / width, 0, 0});
+      previousGrid[{i % width, i / width, 0, 0}] = 1;
     }
   }
 
-  std::map<std::array<int64_t, 4>, int> activeNeighbors;
+  std::map<std::array<int, 4>, int8_t> activeNeighbors;
 
   for (int notUsed = 0; notUsed < 6; ++notUsed) {
 
-    for (const auto& activeCube : previousGrid) {
+    for (const auto& [cube, states] : previousGrid) {
 
-      const auto& [x,y,z,w] = activeCube;
+      if (states == 0) {
+        continue;
+      }
+
+      const auto& [x,y,z,w] = cube;
       // dilate all active cube
-      activeNeighbors[{x, y, z, w}] = activeNeighbors[{x, y, z, w}] - 1;
+      activeNeighbors[cube] = activeNeighbors[cube] - 1;
       for (int ww = -1; ww < 2; ++ww) {
         for (int zz = -1; zz < 2; ++zz) {
           for (int yy = -1; yy < 2; ++yy) {
             for (int xx = -1; xx < 2; ++xx) {
-              if (activeNeighbors.count({xx + x, yy + y, zz + z, ww + w})) {
-                activeNeighbors[{xx + x, yy + y, zz + z, ww + w}] += 1;
+              const std::array<int, 4> neighborCube{xx + x, yy + y, zz + z, ww + w};
+              if (activeNeighbors.count(neighborCube)) {
+                activeNeighbors[neighborCube] += 1;
               } else {
-                activeNeighbors[{xx + x, yy + y, zz + z, ww + w}] = 1;
+                activeNeighbors.emplace(neighborCube, 1);
               }
             }
           }
@@ -217,17 +221,23 @@ size_t part2(const std::tuple<std::vector<uint8_t>, int, int> &input) {
     }
 
     for (const auto& [cube, neighbors] : activeNeighbors) {
-      if (previousGrid.count(cube) && (neighbors < 2 || neighbors > 3)) {
-        previousGrid.erase(cube);
-      } else if (!previousGrid.count(cube) && neighbors == 3) {
-        previousGrid.insert(cube);
+      if (previousGrid.count(cube) && previousGrid[cube] == 1 && (neighbors < 2 || neighbors > 3)) {
+        previousGrid[cube] = 0;
+      } else if (neighbors == 3) {
+        previousGrid[cube] = 1;
       }
     }
 
     activeNeighbors.clear();
   }
 
-  return previousGrid.size();
+  size_t count = 0;
+  for (const auto& [cube, states] : previousGrid) {
+    if (states == 1) {
+      count += 1;
+    }
+  }
+  return count;
 }
 
 std::tuple<std::vector<uint8_t>, int, int> parseInputFile(std::string filename) {
