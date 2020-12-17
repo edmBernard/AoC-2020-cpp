@@ -67,6 +67,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/day13)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/day14)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/day15)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/day16)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/day17)
 
 SET(TEST_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/test/catch2-main.cpp
