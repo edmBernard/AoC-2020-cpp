@@ -18,6 +18,7 @@
 #include "day14/day14.hpp"
 #include "day15/day15.hpp"
 #include "day16/day16.hpp"
+#include "day17/day17.hpp"
 
 // Temporary until I find a nicer solution without macro :(
 #define BENCH_SPLIT(x)                                                                                                 \
@@ -69,6 +70,7 @@ int main() {
   BENCH_SPLIT(14);
   // BENCH_SPLIT(15); // take too much time
   BENCH_SPLIT(16);
+  BENCH_SPLIT(17);
 
   fmt::print("Total duration per run : {:.2f} ms \n\n", totalCount / repetition);
 

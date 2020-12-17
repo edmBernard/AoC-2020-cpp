@@ -7,6 +7,8 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <set>
+#include <map>
 
 namespace day17 {
 
@@ -183,59 +185,49 @@ size_t part2(const std::tuple<std::vector<uint8_t>, int, int> &input) {
   // got luky it work on it I should use a set and only store active point but no motivation
  const auto &[grid, width, height] = input;
 
-  showGrid(grid, width, height);
-
-  const size_t sizeX = 200;
-  const size_t sizeY = 200;
-  const size_t sizeZ = 200;
-  const size_t sizeW = 200;
-  const size_t offset = sizeX/2;
-
-  std::vector<uint8_t> previousGrid(sizeX*sizeY*sizeZ*sizeW, 0);
-  GridAccessor4D prev(previousGrid, sizeX, sizeY, sizeZ, sizeW);
-  prev.refX = offset;
-  prev.refY = offset;
-  prev.refZ = offset;
-  prev.refW = offset;
-
-  for (int i = 0; i < grid.size(); ++i) {
-    prev(i % width, i / width, 0, 0) = grid[i];
+  std::set<std::array<int64_t, 4>> previousGrid;
+  for (int64_t i = 0; i < grid.size(); ++i) {
+    if (grid[i] == 1) {
+      previousGrid.insert({i % width, i / width, 0, 0});
+    }
   }
 
-  std::vector<uint8_t> nextGrid(previousGrid.begin(), previousGrid.end());
-  GridAccessor4D next(nextGrid, sizeX, sizeY, sizeZ, sizeW);
+  std::map<std::array<int64_t, 4>, int> activeNeighbors;
 
   for (int notUsed = 0; notUsed < 6; ++notUsed) {
 
-    for (prev.refW = 1; prev.refW < prev.sizeW-1; ++prev.refW) {
-      for (prev.refZ = 1; prev.refZ < prev.sizeZ-1; ++prev.refZ) {
-        for (prev.refY = 1; prev.refY < prev.sizeY-1; ++prev.refY) {
-          for (prev.refX = 1; prev.refX < prev.sizeX-1; ++prev.refX) {
+    for (const auto& activeCube : previousGrid) {
 
-            int activeNeighbors = -prev.at(0, 0, 0, 0);
-            for (int ww = -1; ww < 2; ++ww) {
-              for (int zz = -1; zz < 2; ++zz) {
-                for (int yy = -1; yy < 2; ++yy) {
-                  for (int xx = -1; xx < 2; ++xx) {
-                   activeNeighbors += prev.at(xx, yy, zz, ww);
-                  }
-                }
+      const auto& [x,y,z,w] = activeCube;
+      // dilate all active cube
+      activeNeighbors[{x, y, z, w}] = activeNeighbors[{x, y, z, w}] - 1;
+      for (int ww = -1; ww < 2; ++ww) {
+        for (int zz = -1; zz < 2; ++zz) {
+          for (int yy = -1; yy < 2; ++yy) {
+            for (int xx = -1; xx < 2; ++xx) {
+              if (activeNeighbors.count({xx + x, yy + y, zz + z, ww + w})) {
+                activeNeighbors[{xx + x, yy + y, zz + z, ww + w}] += 1;
+              } else {
+                activeNeighbors[{xx + x, yy + y, zz + z, ww + w}] = 1;
               }
-            }
-
-            if (prev(0, 0, 0, 0) == 1 && (activeNeighbors < 2 || activeNeighbors > 3)) {
-              next(prev.refX, prev.refY, prev.refZ, prev.refW) = 0;
-            } else if (prev(0, 0, 0, 0) == 0 && activeNeighbors == 3) {
-              next(prev.refX, prev.refY, prev.refZ, prev.refW) = 1;
             }
           }
         }
       }
     }
-    previousGrid = nextGrid;
+
+    for (const auto& [cube, neighbors] : activeNeighbors) {
+      if (previousGrid.count(cube) && (neighbors < 2 || neighbors > 3)) {
+        previousGrid.erase(cube);
+      } else if (!previousGrid.count(cube) && neighbors == 3) {
+        previousGrid.insert(cube);
+      }
+    }
+
+    activeNeighbors.clear();
   }
 
-  return prev.count();
+  return previousGrid.size();
 }
 
 std::tuple<std::vector<uint8_t>, int, int> parseInputFile(std::string filename) {
