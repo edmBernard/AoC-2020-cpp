@@ -28,45 +28,43 @@ enum class Op {
   termination
 };
 
-using Elem = std::variant<Op, int>;
+using Elem = std::variant<Op, int64_t>;
 
 struct Solver {
   std::vector<Elem> stack = {Op::termination};
 
   void push(Elem elem) {
-    std::visit(overloaded{
-        [&](Op t) {
-          if (t == Op::rightParenthesis) {
-            int value = result();
-            pop<Op>();
-            stack.push_back(value);
-          } else {
-            stack.push_back(t);
-          }
-        },
-        [&](int t) {
-          // we can't have to number next to each other without operator between them
-          switch (get<Op>(stack.back())) {
-          case Op::add:
-            pop<Op>(); // remove operator
-            t += pop<int>();
-            break;
-          case Op::mul:
-            pop<Op>(); // remove operator
-            t *= pop<int>();
-            break;
-          case Op::leftParenthesis:
-            // do nothing
-            break;
-          }
-          stack.push_back(t);
-        },
-    },
-    elem);
+    if (holds_alternative<Op>(elem) && get<Op>(elem) == Op::rightParenthesis) {
+      elem = result();
+      pop<Op>();
+    }
+
+    if (holds_alternative<int64_t>(elem) && holds_alternative<Op>(stack.back())) {
+        int64_t value = std::get<int64_t>(elem);
+        switch (get<Op>(stack.back())) {
+            case Op::add:
+                pop<Op>(); // remove operator
+                value += pop<int64_t>();
+                break;
+            case Op::mul:
+                pop<Op>(); // remove operator
+                value *= pop<int64_t>();
+                break;
+            case Op::leftParenthesis:
+            case Op::rightParenthesis:
+            case Op::termination:
+                break;
+            default:
+                throw std::runtime_error("should not happen");
+        }
+        stack.push_back(value);
+    } else {
+        stack.push_back(elem);
+    }
   }
 
-  int result() {
-    return pop<int>();
+  int64_t result() {
+    return pop<int64_t>();
   }
 
   template <typename T>
@@ -95,22 +93,22 @@ struct Solver {
   }
 };
 
-size_t part1(const std::tuple<long, long> &results) {
+size_t part1(const std::tuple<size_t, size_t> &results) {
   return std::get<0>(results);
 }
 
-size_t part2(const std::tuple<long, long> &results) {
+size_t part2(const std::tuple<size_t, size_t> &results) {
   return std::get<1>(results);
 }
 
-std::tuple<long, long> parseInputFile(std::string filename) {
+std::tuple<size_t, size_t> parseInputFile(std::string filename) {
   std::ifstream infile(filename);
   if (!infile.is_open()) {
     throw std::runtime_error("File Not Found : " + filename);
   }
   std::string line;
-  long part1 = 0;
-  long part2 = 0;
+  size_t part1 = 0;
+  size_t part2 = 0;
   while (getline(infile, line)) {
     Solver solver;
     for (char c : line) {
