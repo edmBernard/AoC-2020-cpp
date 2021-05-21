@@ -14,6 +14,8 @@ TEST_CASE("AoC2020 Day18", "[day18]") {
       std::make_tuple("day18/input.txt", 1408133923393, 314455761823725)
     }));
 
+  CAPTURE(filename);
+
   auto res = day18::parseInputFile(filename);
 
   SECTION("Part1 : " + filename) {
