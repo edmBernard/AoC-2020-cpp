@@ -30,6 +30,7 @@ enum class Op {
 
 using Elem = std::variant<Op, int64_t>;
 
+template <bool HavePrecedence>
 struct Solver {
   std::vector<Elem> stack = {Op::termination};
 
@@ -40,31 +41,42 @@ struct Solver {
     }
 
     if (holds_alternative<int64_t>(elem) && holds_alternative<Op>(stack.back())) {
-        int64_t value = std::get<int64_t>(elem);
-        switch (get<Op>(stack.back())) {
-            case Op::add:
-                pop<Op>(); // remove operator
-                value += pop<int64_t>();
-                break;
-            case Op::mul:
-                pop<Op>(); // remove operator
-                value *= pop<int64_t>();
-                break;
-            case Op::leftParenthesis:
-            case Op::rightParenthesis:
-            case Op::termination:
-                break;
-            default:
-                throw std::runtime_error("should not happen");
+      int64_t value = std::get<int64_t>(elem);
+      switch (get<Op>(stack.back())) {
+      case Op::add:
+        pop<Op>(); // remove operator
+        value += pop<int64_t>();
+        break;
+      case Op::mul:
+        if (!HavePrecedence) {
+          pop<Op>(); // remove operator
+          value *= pop<int64_t>();
         }
-        stack.push_back(value);
+        break;
+      case Op::leftParenthesis:
+      case Op::rightParenthesis:
+      case Op::termination:
+        break;
+      default:
+        throw std::runtime_error("should not happen");
+      }
+      stack.push_back(value);
     } else {
-        stack.push_back(elem);
+      stack.push_back(elem);
     }
   }
 
   int64_t result() {
-    return pop<int64_t>();
+    if (HavePrecedence) {
+      int64_t value = pop<int64_t>();
+      while (std::get<Op>(stack.back()) == Op::mul) {
+        pop<Op>();
+        value *= pop<int64_t>();
+      }
+      return value;
+    } else {
+      return pop<int64_t>();
+    }
   }
 
   template <typename T>
@@ -110,13 +122,16 @@ std::tuple<size_t, size_t> parseInputFile(std::string filename) {
   size_t part1 = 0;
   size_t part2 = 0;
   while (getline(infile, line)) {
-    Solver solver;
+    Solver<false> solverPart1;
+    Solver<true> solverPart2;
     for (char c : line) {
       if (c == ' ')
         continue;
-      solver.push(solver.parse(c));
+      solverPart1.push(solverPart1.parse(c));
+      solverPart2.push(solverPart2.parse(c));
     }
-    part1 += solver.result();
+    part1 += solverPart1.result();
+    part2 += solverPart2.result();
   }
 
   return {part1, part2};
