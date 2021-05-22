@@ -36,7 +36,10 @@ struct Point {
   int y;
 
   bool operator<(const Point& rhs) const {
-    return std::pair<int, int>{x, y} < std::pair<int, int>{rhs.x, rhs.y};
+    if (x != rhs.x) {
+      return x < rhs.x;
+    }
+    return y < rhs.y;
   }
 
   int move(std::string_view s) {
@@ -68,23 +71,25 @@ struct Point {
   std::vector<Point> getNeighbors() const {
     std::vector<Point> neighbors;
     neighbors.reserve(6);
-    for (auto i : {"e", "se", "sw", "w", "nw", "ne"}) {
-      Point pt = *this;
-      pt.move(i);
-      neighbors.push_back(pt);
-    }
+    neighbors.emplace_back(x + 1, y + 0);
+    neighbors.emplace_back(x - 1, y + 0);
+    neighbors.emplace_back(x + 0, y + 1);
+    neighbors.emplace_back(x + 0, y - 1);
+    neighbors.emplace_back(x + 1, y - 1);
+    neighbors.emplace_back(x - 1, y + 1);
     return neighbors;
   }
 };
 
 void flipTile(std::map<Point, bool> &list, Point pt) {
+  bool &color = list[pt];
   if (list.contains(pt)) {
-    list[pt] = !list[pt];
+    color = !color;
   } else {
-    list[pt] = true;
+    color = true;
   }
 
-  if (list[pt]) {
+  if (color) {
     for (auto neighbor : pt.getNeighbors()) {
       if (!list.contains(neighbor)) {
         list[neighbor] = false;
@@ -119,9 +124,11 @@ std::tuple<size_t, size_t> parseInputFile(std::string filename) {
     std::vector<Point> tileToFlip;
     for (auto [tile, color] : listOfFlippedTile) {
       int count = 0;
-      for (Point neighbor : tile.getNeighbors()) {
-        if (listOfFlippedTile.contains(neighbor) && listOfFlippedTile[neighbor]) {
-          ++count;
+      for (const Point &neighbor : tile.getNeighbors()) {
+        if (listOfFlippedTile.contains(neighbor)) {
+          if (listOfFlippedTile[neighbor]) {
+            ++count;
+          }
         }
       }
 
