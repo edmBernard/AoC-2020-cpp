@@ -25,10 +25,8 @@ size_t part2(const std::tuple<size_t, size_t> &results) {
   return std::get<1>(results);
 }
 
-size_t loop(size_t value, size_t subjectNumber) {
-  value *= subjectNumber;
-  value %= 20201227;
-  return value;
+inline size_t loop(size_t value, size_t subjectNumber) {
+  return (value * subjectNumber) % 20201227;
 }
 
 int getLoopSize(size_t key, size_t subjectNumber) {
