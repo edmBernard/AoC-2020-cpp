@@ -116,6 +116,7 @@ std::tuple<size_t, size_t> parseInputFile(std::string filename) {
   while (getline(infile, line)) {
     if (line.empty()) {
       // Uncomment for part 2
+      // Currently part2 don't work but I haven't been able to find why
       // g_ruleList[8] = std::make_unique<Rule>(std::vector<int>{42}, std::vector<int>{42, 8});
       // g_ruleList[11] = std::make_unique<Rule>(std::vector<int>{42, 31}, std::vector<int>{42, 11, 31});
       parsingRule = false;
