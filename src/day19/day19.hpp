@@ -25,6 +25,9 @@ struct Rule {
   Rule(std::vector<int> group1, std::vector<int> group2 = {}) : group1(group1), group2(group2), isRoot(false) {}
 
   bool call(std::string_view s, int& offset) {
+    if (s.empty()) {
+      return false;
+    }
     if (isRoot) {
       ++offset;
       return s[0] == letter;
@@ -112,6 +115,9 @@ std::tuple<size_t, size_t> parseInputFile(std::string filename) {
   std::regex rulesRegex("([0-9]+): \"([a-z])\"");
   while (getline(infile, line)) {
     if (line.empty()) {
+      // Uncomment for part 2
+      // g_ruleList[8] = std::make_unique<Rule>(std::vector<int>{42}, std::vector<int>{42, 8});
+      // g_ruleList[11] = std::make_unique<Rule>(std::vector<int>{42, 31}, std::vector<int>{42, 11, 31});
       parsingRule = false;
       continue;
     }
@@ -133,7 +139,9 @@ std::tuple<size_t, size_t> parseInputFile(std::string filename) {
         std::stringstream ss(line);
         std::string ruleIndex;
         std::getline(ss, ruleIndex, ':');
+
         g_ruleList[std::stoi(ruleIndex)] = std::make_unique<Rule>(line[found+1]);
+
       } else {
         std::stringstream ss(line);
         std::string ruleIndex;
@@ -146,8 +154,7 @@ std::tuple<size_t, size_t> parseInputFile(std::string filename) {
       }
 
     } else  {
-      int offset = 0;
-      if (g_ruleList[0]->call(line, offset) && (offset == line.length())) {
+      if (int offset = 0; g_ruleList[0]->call(line, offset) && (offset == line.length())) {
         ++part1;
       }
     }
