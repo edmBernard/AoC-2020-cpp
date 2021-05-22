@@ -84,9 +84,11 @@ void flipTile(std::map<Point, bool> &list, Point pt) {
     list[pt] = true;
   }
 
-  for (auto neighbor : pt.getNeighbors()) {
-    if (!list.contains(neighbor)) {
-      list[neighbor] = false;
+  if (list[pt]) {
+    for (auto neighbor : pt.getNeighbors()) {
+      if (!list.contains(neighbor)) {
+        list[neighbor] = false;
+      }
     }
   }
 }
@@ -116,26 +118,18 @@ std::tuple<size_t, size_t> parseInputFile(std::string filename) {
   for (int epoch = 0; epoch < 100; ++epoch) {
     std::vector<Point> tileToFlip;
     for (auto [tile, color] : listOfFlippedTile) {
-      if (color) {
-        int count = 0;
-        for (Point neighbor : tile.getNeighbors()) {
-          if (listOfFlippedTile.contains(neighbor) && listOfFlippedTile[neighbor]) {
-            ++count;
-          }
+      int count = 0;
+      for (Point neighbor : tile.getNeighbors()) {
+        if (listOfFlippedTile.contains(neighbor) && listOfFlippedTile[neighbor]) {
+          ++count;
         }
-        if (count == 0 || count > 2) {
-          tileToFlip.push_back(tile);
-        }
-      } else {
-        int count = 0;
-        for (Point neighbor : tile.getNeighbors()) {
-          if (listOfFlippedTile.contains(neighbor) && listOfFlippedTile[neighbor]) {
-            ++count;
-          }
-        }
-        if (count == 2) {
-          tileToFlip.push_back(tile);
-        }
+      }
+
+      if (color && (count == 0 || count > 2)) {
+        tileToFlip.push_back(tile);
+      }
+      if (!color && count == 2) {
+        tileToFlip.push_back(tile);
       }
     }
 
