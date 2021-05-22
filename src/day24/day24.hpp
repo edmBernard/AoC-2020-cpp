@@ -2,17 +2,17 @@
 #pragma once
 
 #include <algorithm>
+#include <array>
 #include <exception>
 #include <fstream>
-#include <sstream>
+#include <map>
 #include <memory>
+#include <regex>
 #include <set>
+#include <sstream>
 #include <string>
 #include <string_view>
 #include <vector>
-#include <map>
-#include <array>
-#include <regex>
 
 namespace day24 {
 
@@ -24,12 +24,11 @@ size_t part2(const std::tuple<size_t, size_t> &results) {
   return std::get<1>(results);
 }
 
-
 struct Point {
   int x;
   int y;
 
-  bool operator<(const Point& rhs) const {
+  bool operator<(const Point &rhs) const {
     if (x != rhs.x) {
       return x < rhs.x;
     }
@@ -65,61 +64,62 @@ struct Point {
 
 struct Board {
   Board(int64_t width, int64_t height)
-  : width(width)
-  , height(height)
-  , buffer(width*height, 0)
-  , center(width/2 + height/2*width) {
+      : width(width), height(height), buffer(width * height, 0), center(width / 2 + height / 2 * width) {
   }
 
   inline size_t offset(int64_t x, int64_t y) {
     return center + x + y * width;
   }
 
-  uint8_t &operator()(int64_t x, int64_t y) {
+  inline uint8_t &operator()(int64_t x, int64_t y) {
     return buffer[offset(x, y)];
   }
-  uint8_t &operator()(const Point &pt) {
-    return buffer[offset(pt.x, pt.y)];
-  }
-  uint8_t &operator()(size_t address) {
+  inline uint8_t &operator()(size_t address) {
     return buffer[address];
   }
 
   int countNeighbors(size_t address) {
     return (
-      buffer[address + 1] +
-      buffer[address - 1] +
-      buffer[address + width] +
-      buffer[address - width] +
-      buffer[address + 1 - width] +
-      buffer[address - 1 + width]);
+        operator()(address + 1) +
+        operator()(address - 1) +
+        operator()(address + width) +
+        operator()(address - width) +
+        operator()(address + 1 - width) +
+        operator()(address - 1 + width));
   }
 
   std::array<size_t, 6> getNeighbors(size_t address) {
     return {
-      address + 1,
-      address - 1,
-      address + width,
-      address - width,
-      address + 1 - width,
-      address - 1 + width
-    };
+        address + 1,
+        address - 1,
+        address + width,
+        address - width,
+        address + 1 - width,
+        address - 1 + width};
   }
 
   void flip(size_t address) {
-    uint8_t& color = this->operator()(address);
+    uint8_t &color = operator()(address);
     color = color == 0 ? 1 : 0;
+    // if (color == 1) {
+    //   for (size_t neighbor : getNeighbors(address)) {
+    //     if (buffer[neighbor] == 0) {
+    //       flipped.insert(neighbor);
+    //     }
+    //   }
+    // }
   }
 
   void flip(size_t x, size_t y) {
-    uint8_t& color = this->operator()(x, y);
-    color = color == 0 ? 1 : 0;
+    flip(offset(x, y));
+    // flipped.insert(offset(x, y));
   }
 
   int64_t width;
   int64_t height;
   int64_t center;
   std::vector<uint8_t> buffer;
+  std::set<size_t> flipped;
 };
 
 std::tuple<size_t, size_t> parseInputFile(std::string filename) {
@@ -129,7 +129,12 @@ std::tuple<size_t, size_t> parseInputFile(std::string filename) {
   }
   std::string line;
 
-  Board board(500, 500);
+  // Using a vector can be wrong if tile goes out of the area
+  // It's possible to keep a set of flipped tile to reduce the number of check tiles
+  //  - with a board of 200x200 : the raw processing is 4 time faster
+  //  - with a board of 1000x1000 : the raw processing is 3 time slower
+  // so not worth in our case
+  Board board(200, 200);
 
   while (getline(infile, line)) {
     Point pt{0, 0};
@@ -146,8 +151,9 @@ std::tuple<size_t, size_t> parseInputFile(std::string filename) {
 
   for (int epoch = 0; epoch < 100; ++epoch) {
     std::vector<size_t> tileToFlip;
-    for (int64_t i = - board.height / 2 + 1; i < board.height / 2 - 1; ++i) {
-      for (int64_t j = - board.width / 2; j < board.width / 2 - 1; ++j) {
+    // for (size_t offset : board.flipped) {
+    for (int64_t i = -board.height / 2 + 1; i < board.height / 2 - 1; ++i) {
+      for (int64_t j = -board.width / 2; j < board.width / 2 - 1; ++j) {
         const size_t offset = board.offset(j, i);
         const int count = board.countNeighbors(offset);
 
