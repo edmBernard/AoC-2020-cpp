@@ -71,6 +71,8 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/day17)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/day18)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/day19)
 
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/day25)
+
 SET(TEST_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/test/catch2-main.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test/day1-catch2.cpp
@@ -92,6 +94,8 @@ SET(TEST_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/test/day17-catch2.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test/day18-catch2.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test/day19-catch2.cpp
+
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/day25-catch2.cpp
 )
 
 add_executable(unit-test ${TEST_SOURCES} ${SOURCES})
