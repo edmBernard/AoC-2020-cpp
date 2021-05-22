@@ -21,15 +21,10 @@ std::map<int, std::unique_ptr<Rule>> g_ruleList;
 
 
 struct Rule {
-  Rule(char letter) : letter(letter), isRoot(true) {
-    show();
-  }
-  Rule(std::vector<int> group1, std::vector<int> group2 = {}) : group1(group1), group2(group2), isRoot(false) {
-    show();
-  }
+  Rule(char letter) : letter(letter), isRoot(true) {}
+  Rule(std::vector<int> group1, std::vector<int> group2 = {}) : group1(group1), group2(group2), isRoot(false) {}
 
   bool call(std::string_view s, int& offset) {
-    show();
     if (isRoot) {
       ++offset;
       return s[0] == letter;
@@ -37,8 +32,8 @@ struct Rule {
     } else {
       bool match = true;
       int temp_offset = 0;
-      for (int i = 0; i < group1.size(); ++i) {
-        match &= g_ruleList[group1[i]]->call(s.data()+temp_offset, temp_offset);
+      for (auto &r : group1) {
+        match &= g_ruleList[r]->call(s.data()+temp_offset, temp_offset);
         if (!match) {
           break;
         }
@@ -47,8 +42,8 @@ struct Rule {
       if (!group2.empty() && match == false) {
         match = true;
         temp_offset = 0;
-        for (int i = 0; i < group2.size(); ++i) {
-          match &= g_ruleList[group2[i]]->call(s.data()+temp_offset, temp_offset);
+        for (auto &r : group2) {
+          match &= g_ruleList[r]->call(s.data()+temp_offset, temp_offset);
           if (!match) {
             break;
           }
