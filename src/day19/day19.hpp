@@ -111,8 +111,6 @@ std::tuple<size_t, size_t> parseInputFile(std::string filename) {
   size_t part2 = 0;
   bool parsingRule = true;
 
-  std::regex rulesRootRegex("([0-9]+): \"([a-z])\"");
-  std::regex rulesRegex("([0-9]+): \"([a-z])\"");
   while (getline(infile, line)) {
     if (line.empty()) {
       // Uncomment for part 2
