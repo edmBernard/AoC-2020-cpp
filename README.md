@@ -53,6 +53,7 @@ Day14    : 23.77 ms
 Day16    : 1.00 ms
 Day17    : 84.78 ms
 Day18    : 1.00 ms
+Day19    : 2.41 ms
 Total duration per run : 138.41 ms
 
 Day15    : 552.23 ms // not take in account, too long
