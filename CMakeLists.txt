@@ -97,7 +97,7 @@ SET(TEST_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/test/day18-catch2.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test/day19-catch2.cpp
 
-
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/day23-catch2.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test/day24-catch2.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test/day25-catch2.cpp
 )

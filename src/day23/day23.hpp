@@ -15,29 +15,32 @@
 
 namespace day23 {
 
-
-
-size_t part1(const std::tuple<size_t, size_t> &results) {
-  return std::get<0>(results);
-}
-
-size_t part2(const std::tuple<size_t, size_t> &results) {
-  return std::get<1>(results);
-}
-
 struct Board {
-  Board(std::string line) {
-    cups.reserve(line.length());
-    for (char c : line) cups.push_back(c - '0');
-  }
   Board(std::string line, size_t maxDim) {
+    // Add input to vector
     cups.reserve(maxDim);
     for (char c : line) {
-      cups.push_back(c - '0');
+      // we start index to 0 so we will have to add 1 for output
+      cups.push_back(c - '1');
     }
-    for (int i = line.length(); i < maxDim; ++i) {
-      cups.push_back(i);
+
+    // try to consider a chain list like
+    index = std::vector<int64_t>(maxDim, 0);
+    std::iota(index.begin(), index.end(), 1);
+
+    // content of the current is the next position
+    for (int i = 1; i < line.size(); ++i) {
+      index[offset(cups[i-1])] = cups[i];
     }
+
+    // we connect last position to first position
+    if (index.size() == cups.size()) {
+      index[cups.back()] = cups[0];
+    } else {
+      index[cups.back()] = cups.size();
+      index[index.size() - 1] = cups[0];
+    }
+    currentIdx = cups[0];
   }
 
   size_t offset(size_t index) {
@@ -50,8 +53,18 @@ struct Board {
 
   void show() {
     for (int i = 0; i < cups.size(); ++i) {
-      if (i == currentIdx) std::cout << "(" << cups[i] << ") ";
-      else std::cout << cups[i] << " ";
+      if (i == currentIdx) std::cout << "(" << cups[i]+1 << ") ";
+      else std::cout << cups[i]+1 << " ";
+    }
+    std::cout << std::endl;
+  }
+  void chain() {
+    int64_t len = index.size();
+    std::cout << "(" << currentIdx+1 << ")" << " ";
+    int64_t i = currentIdx;
+    while (--len) {
+      std::cout << index[i]+1 << " ";
+      i = index[i];
     }
     std::cout << std::endl;
   }
@@ -65,55 +78,72 @@ struct Board {
   }
 
   int64_t getResultPart1() {
-    auto found = std::find(cups.begin(), cups.end(), 1);
-    const size_t step = found - cups.begin();
-    int64_t res = 0;
-    int64_t power = 1;
-    for (int i = cups.size() - 1; i > 0; --i) {
-      // 1 should be removed
-      res += cups[offset(i+step)] * power;
-      power *= 10;
+    int64_t res = index[0]+1;
+    int64_t len = index.size() - 1;
+    int64_t i = index[0];
+    while (--len) {
+      res = res * 10 + index[i]+1;
+      i = index[i];
     }
     return res;
   }
   std::pair<int64_t, int64_t> getResultPart2() {
-    auto found = std::find(cups.begin(), cups.end(), 1);
-    return {*(found+1), *(found+2)};
+    return {index[0] + 1 , index[index[0]] + 1};
   }
 
   void flip() {
-    const int64_t pick1 = cups[offset(currentIdx+1)];
-    const int64_t pick2 = cups[offset(currentIdx+2)];
-    const int64_t pick3 = cups[offset(currentIdx+3)];
 
-    int64_t min = cups[currentIdx];
+    const int64_t pick1 = index[currentIdx];
+    const int64_t pick2 = index[pick1];
+    const int64_t pick3 = index[pick2]; // position of pick3
 
+    // find insert point
+    int64_t min = currentIdx;
     do {
-      min = circleValue(min-1);
+      min = (min == 0 ? index.size() : min) - 1;
     } while (min == pick1 || min == pick2 || min == pick3);
 
-    const auto newPosition = std::find(cups.begin(), cups.end(), min);
+    // cut and reconnect linked list
+    currentIdx = index[currentIdx] = index[pick3];
+    index[pick3] = index[min];
+    index[min] = pick1;
 
-    size_t insertPoint = newPosition - cups.begin();
 
-    if (currentIdx > insertPoint) {
-      insertPoint += cups.size();
-    }
-    for (int64_t i = currentIdx+4; i < insertPoint + 1; ++i) {
-      cups[offset(i-3)] = cups[offset(i)];
-    }
-    cups[offset(insertPoint + 1 - 3)] = pick1;
-    cups[offset(insertPoint + 2 - 3)] = pick2;
-    cups[offset(insertPoint + 3 - 3)] = pick3;
-
-    currentIdx = offset(currentIdx+1);
   }
 
-  size_t currentIdx = 0;
+  int64_t currentIdx;
   std::vector<int64_t> cups;
+  std::vector<int64_t> index;
 };
 
-std::tuple<size_t, size_t> parseInputFile(std::string filename) {
+
+size_t part1(const std::string &line) {
+
+  Board boardPart1(line, line.length());
+
+  for (int i = 0; i < 100; ++i) {
+    boardPart1.flip();
+  }
+
+  return boardPart1.getResultPart1();
+}
+
+size_t part2(const std::string &line) {
+
+  Board boardPart2(line, 1'000'000);
+
+  for (int i = 0; i < 10'000'000; ++i) {
+    boardPart2.flip();
+  }
+
+  auto [number1, number2] = boardPart2.getResultPart2();
+
+  return  number1 * number2;
+}
+
+
+
+std::string parseInputFile(std::string filename) {
   std::ifstream infile(filename);
   if (!infile.is_open()) {
     throw std::runtime_error("File Not Found : " + filename);
@@ -121,36 +151,8 @@ std::tuple<size_t, size_t> parseInputFile(std::string filename) {
   std::string line;
 
   getline(infile, line);
-  Board boardPart1(line);
 
-  //Part1
-  boardPart1.show();
-  for (int i = 0; i < 100; ++i) {
-    boardPart1.flip();
-  }
-  boardPart1.show();
-
-  size_t part1 = boardPart1.getResultPart1();
-  std::cout << "part1: " << part1 << std::endl;
-
-  // Part2
-  Board boardPart2(line, 1'000'000);
-
-  for (int i = 0; i < 10'000'000; ++i) {
-    if (i % 1000 == 0) {
-      std::cout << "i: " << i << std::endl;
-    }
-    boardPart2.flip();
-  }
-  // boardPart2.show();
-
-  auto [number1, number2] = boardPart2.getResultPart2();
-  std::cout << "number1: " << number1 << std::endl;
-  std::cout << "number2: " << number2 << std::endl;
-  size_t part2 = number1 * number2;
-  std::cout << "part2: " << part2 << std::endl;
-
-  return {part1, part2};
+  return line;
 }
 
 } // namespace day23

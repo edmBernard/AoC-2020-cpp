@@ -8,8 +8,8 @@
 TEST_CASE("AoC2020 Day23", "[day23]") {
 
   auto [filename, expectedPart1, expectedPart2] = GENERATE(table<std::string, size_t, size_t>({
-      std::make_tuple("day23/input_part1_test1.txt", 67384529, 0),
-      std::make_tuple("day23/input.txt", 47598263, 0)
+      std::make_tuple("day23/input_part1_test1.txt", 67384529, 149245887792),
+      std::make_tuple("day23/input.txt", 47598263, 248009574232)
     }));
 
   CAPTURE(filename);
