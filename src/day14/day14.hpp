@@ -13,6 +13,7 @@
 #include <numeric>
 #include <regex>
 #include <bitset>
+#include <unordered_map>
 
 namespace day14 {
 
