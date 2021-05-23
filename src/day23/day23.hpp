@@ -134,9 +134,9 @@ std::tuple<size_t, size_t> parseInputFile(std::string filename) {
   std::cout << "part1: " << part1 << std::endl;
 
   // Part2
-  Board boardPart2(line, 1000000);
+  Board boardPart2(line, 1'000'000);
 
-  for (int i = 0; i < 10000000; ++i) {
+  for (int i = 0; i < 10'000'000; ++i) {
     if (i % 1000 == 0) {
       std::cout << "i: " << i << std::endl;
     }
