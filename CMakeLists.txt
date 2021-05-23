@@ -37,7 +37,7 @@ SET(SOURCES
 #**************************************************************************************************
 # Set compiler ************************************************************************************
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-  add_compile_options(/std:c++latest /Oy)
+  add_compile_options(/std:c++latest /02 /Ot /Oy)
 else()
   add_compile_options(-std=c++2a -fPIC -O3 -fno-omit-frame-pointer)
 endif()
