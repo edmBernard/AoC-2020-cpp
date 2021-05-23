@@ -30,7 +30,7 @@ struct Board {
 
     // content of the current is the next position
     for (int i = 1; i < line.size(); ++i) {
-      index[offset(cups[i-1])] = cups[i];
+      index[cups[i-1]] = cups[i];
     }
 
     // we connect last position to first position
@@ -43,21 +43,6 @@ struct Board {
     currentIdx = cups[0];
   }
 
-  size_t offset(size_t index) {
-    return (index + cups.size()) % cups.size();
-  }
-
-  int circleValue(int64_t value) {
-    return value < 1 ? cups.size() : (value > cups.size() ? 1 : value);
-  }
-
-  void show() {
-    for (int i = 0; i < cups.size(); ++i) {
-      if (i == currentIdx) std::cout << "(" << cups[i]+1 << ") ";
-      else std::cout << cups[i]+1 << " ";
-    }
-    std::cout << std::endl;
-  }
   void chain() {
     int64_t len = index.size();
     std::cout << "(" << currentIdx+1 << ")" << " ";
@@ -69,17 +54,9 @@ struct Board {
     std::cout << std::endl;
   }
 
-  template <typename T>
-  static void show(std::vector<T> vec) {
-    for (int i = 0; i < vec.size(); ++i) {
-      std::cout << vec[i] << " ";
-    }
-    std::cout << std::endl;
-  }
-
   int64_t getResultPart1() {
     int64_t res = index[0]+1;
-    int64_t len = index.size() - 1;
+    int64_t len = index.size() - 1; // skip the 1
     int64_t i = index[0];
     while (--len) {
       res = res * 10 + index[i]+1;
@@ -87,6 +64,7 @@ struct Board {
     }
     return res;
   }
+
   std::pair<int64_t, int64_t> getResultPart2() {
     return {index[0] + 1 , index[index[0]] + 1};
   }
@@ -107,7 +85,6 @@ struct Board {
     currentIdx = index[currentIdx] = index[pick3];
     index[pick3] = index[min];
     index[min] = pick1;
-
 
   }
 
