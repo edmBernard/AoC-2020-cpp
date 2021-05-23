@@ -44,8 +44,8 @@ struct Board {
     return (index + cups.size()) % cups.size();
   }
 
-  static int circleValue(int value) {
-    return value < 1 ? 9 : (value > 9 ? 1 : value);
+  int circleValue(int64_t value) {
+    return value < 1 ? cups.size() : (value > cups.size() ? 1 : value);
   }
 
   void show() {
@@ -82,51 +82,31 @@ struct Board {
   }
 
   void flip() {
-    size_t pick1 = offset(currentIdx+1);
-    size_t pick2 = offset(currentIdx+2);
-    size_t pick3 = offset(currentIdx+3);
-    int min = cups[currentIdx];
-    // std::cout << "pickup: " << cups[pick1] << ", " << cups[pick2] << ", " << cups[pick3] << std::endl;
-    auto newPosition = cups.end();
+    const int64_t pick1 = cups[offset(currentIdx+1)];
+    const int64_t pick2 = cups[offset(currentIdx+2)];
+    const int64_t pick3 = cups[offset(currentIdx+3)];
+
+    int64_t min = cups[currentIdx];
+
     do {
       min = circleValue(min-1);
-      newPosition = std::find(cups.begin(), cups.end(), min);
-    } while (
-      newPosition == cups.end()
-      || newPosition == cups.begin()+pick1
-      || newPosition == cups.begin()+pick2
-      || newPosition == cups.begin()+pick3);
+    } while (min == pick1 || min == pick2 || min == pick3);
+
+    const auto newPosition = std::find(cups.begin(), cups.end(), min);
 
     size_t insertPoint = newPosition - cups.begin();
 
-    // std::cout << "min: " << min << std::endl;
-    // std::cout << "newPosition: " << insertPoint << std::endl;
-
-    std::vector<int64_t> next(cups.size(), 0);
-    std::vector<int64_t> index(cups.size(), 0);
-    std::iota(index.begin(), index.end(), 0);
-
-    // show();
-
-    // show(index);
-    index[offset(currentIdx+1)] += currentIdx + insertPoint - 3;
-    index[offset(currentIdx+2)] += currentIdx + insertPoint - 3;
-    index[offset(currentIdx+3)] += currentIdx + insertPoint - 3;
-    // show(index);
-    for (int64_t i = currentIdx+4; i < insertPoint+1; ++i) {
-      index[offset(i)] -= 3;
+    if (currentIdx > insertPoint) {
+      insertPoint += cups.size();
     }
-    // show(index);
-
-    for (int64_t i = 0; i < index.size(); ++i) {
-      index[i] -= 1;
+    for (int64_t i = currentIdx+4; i < insertPoint + 1; ++i) {
+      cups[offset(i-3)] = cups[offset(i)];
     }
-    // show(index);
-    for (int64_t i = 0; i < next.size(); ++i) {
-      next[offset(index[i])] = cups[i];
-    }
-    cups = next;
+    cups[offset(insertPoint + 1 - 3)] = pick1;
+    cups[offset(insertPoint + 2 - 3)] = pick2;
+    cups[offset(insertPoint + 3 - 3)] = pick3;
 
+    currentIdx = offset(currentIdx+1);
   }
 
   size_t currentIdx = 0;
@@ -151,12 +131,15 @@ std::tuple<size_t, size_t> parseInputFile(std::string filename) {
   boardPart1.show();
 
   size_t part1 = boardPart1.getResultPart1();
+  std::cout << "part1: " << part1 << std::endl;
 
   // Part2
   Board boardPart2(line, 1000000);
 
-  // boardPart2.show();
   for (int i = 0; i < 10000000; ++i) {
+    if (i % 1000 == 0) {
+      std::cout << "i: " << i << std::endl;
+    }
     boardPart2.flip();
   }
   // boardPart2.show();
