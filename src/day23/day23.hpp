@@ -84,9 +84,7 @@ struct Board {
       } while (min == pick1 || min == pick2 || min == pick3);
 
       // cut and reconnect linked list
-      currentIdx = index[currentIdx] = index[pick3];
-      index[pick3] = index[min];
-      index[min] = pick1;
+      currentIdx = index[currentIdx] = std::exchange(index[pick3], std::exchange(index[min], pick1));
     }
   }
 

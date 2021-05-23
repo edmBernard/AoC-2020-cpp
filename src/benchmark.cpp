@@ -58,7 +58,7 @@ int main() {
 
   double totalCount = 0;
 
-  const int repetition = 1;
+  const int repetition = 10;
   BENCH_SPLIT(1);
   BENCH_SPLIT(2);
   BENCH_SPLIT(3);
@@ -73,7 +73,7 @@ int main() {
   BENCH_SPLIT(12);
   BENCH_SPLIT(13);
   BENCH_SPLIT(14);
-  // BENCH_SPLIT(15); // take too much time
+  BENCH_SPLIT(15);
   BENCH_SPLIT(16);
   BENCH_SPLIT(17);
   BENCH_SPLIT(18);
