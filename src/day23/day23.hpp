@@ -18,14 +18,14 @@ namespace day23 {
 struct Board {
   Board(std::string line, size_t maxDim) {
     // Add input to vector
-    cups.reserve(maxDim);
+    cups.reserve(line.length());
     for (char c : line) {
       // we start index to 0 so we will have to add 1 for output
       cups.push_back(c - '1');
     }
 
     // try to consider a chain list like
-    index = std::vector<int64_t>(maxDim, 0);
+    index = std::vector<int>(maxDim, 0);
     std::iota(index.begin(), index.end(), 1);
 
     // content of the current is the next position
@@ -69,51 +69,49 @@ struct Board {
     return {index[0] + 1 , index[index[0]] + 1};
   }
 
-  void flip() {
+  void run(size_t iterations) {
 
-    const int64_t pick1 = index[currentIdx];
-    const int64_t pick2 = index[pick1];
-    const int64_t pick3 = index[pick2]; // position of pick3
+    for (int i = 0; i < iterations; ++i) {
 
-    // find insert point
-    int64_t min = currentIdx;
-    do {
-      min = (min == 0 ? index.size() : min) - 1;
-    } while (min == pick1 || min == pick2 || min == pick3);
+      const int pick1 = index[currentIdx];
+      const int pick2 = index[pick1];
+      const int pick3 = index[pick2]; // position of pick3
 
-    // cut and reconnect linked list
-    currentIdx = index[currentIdx] = index[pick3];
-    index[pick3] = index[min];
-    index[min] = pick1;
+      // find insert point
+      int min = currentIdx;
+      do {
+        min = (min == 0 ? index.size() : min) - 1;
+      } while (min == pick1 || min == pick2 || min == pick3);
 
+      // cut and reconnect linked list
+      currentIdx = index[currentIdx] = index[pick3];
+      index[pick3] = index[min];
+      index[min] = pick1;
+    }
   }
 
-  int64_t currentIdx;
-  std::vector<int64_t> cups;
-  std::vector<int64_t> index;
+  int currentIdx;
+  std::vector<int> cups;
+  std::vector<int> index;
 };
 
 
 size_t part1(const std::string &line) {
 
-  Board boardPart1(line, line.length());
+  Board board(line, line.length());
 
-  for (int i = 0; i < 100; ++i) {
-    boardPart1.flip();
-  }
+  board.run(100);
 
-  return boardPart1.getResultPart1();
+  return board.getResultPart1();
 }
 
 size_t part2(const std::string &line) {
 
-  Board boardPart2(line, 1'000'000);
+  Board board(line, 1'000'000);
 
-  for (int i = 0; i < 10'000'000; ++i) {
-    boardPart2.flip();
-  }
+  board.run(10'000'000);
 
-  auto [number1, number2] = boardPart2.getResultPart2();
+  auto [number1, number2] = board.getResultPart2();
 
   return  number1 * number2;
 }
